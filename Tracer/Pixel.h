@@ -5,7 +5,7 @@ namespace Tracer
 {
 	struct Pixel
 	{
-		int __value[3];
+		int value[3];
 
 		Pixel();
 		Pixel(const unsigned int r, const unsigned int g, const unsigned int b);

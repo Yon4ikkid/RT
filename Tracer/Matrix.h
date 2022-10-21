@@ -6,7 +6,7 @@ namespace Tracer
 	// A 3x3 matrix - a dependancy of some calculations.
 	struct Matrix
 	{
-		float __v[3][3];
+		float v[3][3];
 
 		Matrix();
 		Matrix(const Matrix& other);

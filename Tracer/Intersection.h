@@ -8,8 +8,8 @@ namespace Tracer
 	// Represents an intersection between a ray and an object
 	struct Intersection
 	{
-		Vector __point;	// Point of intersection
-		Vector __normal;	// Surface normal at point of intersection
-		Material __m;	// Object material
+		Vector point;	// Point of intersection
+		Vector normal;	// Surface normal at point of intersection
+		Material m;	// Object material
 	};
 }

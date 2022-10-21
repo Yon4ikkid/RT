@@ -9,21 +9,23 @@
 
 using namespace Tracer;
 
+Tracer::Camera::Camera() : height(0), width(0) { }
+
 Camera::Camera(const int iwidth, const int iheight, const float ifd,
 	const Vector& ifo, const float xRot, const float yRot, const float zRot)
 {
-	__o = ifo;
-	__width = iwidth;
-	__height = iheight;
+	o = ifo;
+	this->width = iwidth;
+	this->height = iheight;
 
 	if (iwidth <= 0 || iheight <= 0)
 		throw std::runtime_error("Camera size cannot be negative or zero");
 
 	// At first the camera around the origin is constructed, aligned with the axes,
 	//	and later it is rotated and translated as required
-	Vector	a(-__width / 2, ifd, __height / 2),
-			b(__width / 2, ifd, __height / 2),
-			c(-__width / 2, ifd, -__height / 2);
+	Vector	a(-width / 2, ifd, height / 2),
+			b(width / 2, ifd, height / 2),
+			c(-width / 2, ifd, -height / 2);
 
 	
 	// Create rotation matrix
@@ -32,15 +34,15 @@ Camera::Camera(const int iwidth, const int iheight, const float ifd,
 	float sinA = sinf(zRad), sinB = sinf(yRad), sinG = sinf(xRad);
 	float cosA = cosf(zRad), cosB = cosf(yRad), cosG = cosf(xRad);
 
-	rotMatrix.__v[0][0] = cosA * cosB;
-	rotMatrix.__v[0][1] = cosA * sinB * sinG - sinA * cosG;
-	rotMatrix.__v[0][2] = cosA * sinB * cosG + sinA * sinG;
-	rotMatrix.__v[1][0] = sinA * cosB;
-	rotMatrix.__v[1][1] = sinA * sinB * sinG + cosA * cosG;
-	rotMatrix.__v[1][2] = sinA * sinB * cosG - cosA * sinG;
-	rotMatrix.__v[2][0] = -sinB;
-	rotMatrix.__v[2][1] = cosB * sinG;
-	rotMatrix.__v[2][2] = cosB * cosG;
+	rotMatrix.v[0][0] = cosA * cosB;
+	rotMatrix.v[0][1] = cosA * sinB * sinG - sinA * cosG;
+	rotMatrix.v[0][2] = cosA * sinB * cosG + sinA * sinG;
+	rotMatrix.v[1][0] = sinA * cosB;
+	rotMatrix.v[1][1] = sinA * sinB * sinG + cosA * cosG;
+	rotMatrix.v[1][2] = sinA * sinB * cosG - cosA * sinG;
+	rotMatrix.v[2][0] = -sinB;
+	rotMatrix.v[2][1] = cosB * sinG;
+	rotMatrix.v[2][2] = cosB * cosG;
 	
 
 	// Translate points
@@ -49,39 +51,28 @@ Camera::Camera(const int iwidth, const int iheight, const float ifd,
 	c = rotMatrix * c + ifo;
 	
 	// Construct the boundary rays
-	__right = (b - a).unit();
-	__down = (c - a).unit();
-	//__xRay = Ray(a, (b - a).unit());
-	//__yRay = Ray(a, (c - a).unit());
+	this->right = (b - a).unit();
+	this->down = (c - a).unit();
+	this->pivot = a;
 }
 
-Ray Tracer::Camera::getNextRay()
+Ray Tracer::Camera::getRay(const int line, const int column)
 {
-	float tX = __rC - 0.5f;
-	float tY = __dC - 0.5f;
-
-	Vector d = __pivot + __right * __rC + __down * __dC;
-
-	__rC++;
-	if (__rC % __width == 0)
-	{
-		__rC = 0;
-		__dC++;
-	}
-	if (__dC >= __height)
-	{
-		throw std::runtime_error("Cannot generate rays beyond camera limits");
-	}
-
-	return Ray(__o, d);
+	if (line > this->height || column > this->width || line <= 0 || column <= 0)
+		throw std::runtime_error("Ray request out of camera bounds");
+	
+	// Calculate the direction pivot vector of the ray (middle of pixel in space)
+	Vector d = this->pivot + this->right * (column - 0.5f) + this->down * (line - 0.5f);
+	
+	return Ray(this->o, (d - this->o).unit());
 }
 
 std::ostream& Tracer::operator<<(std::ostream& os, const Camera& c)
 {
-	os << "H: " << c.__height << " W: " << c.__width << '\n';
-	os << "Pivot: " << c.__pivot << '\n';
-	os << "Right: " << c.__right << '\n';
-	os << "Down: " << c.__down << '\n';
+	os << "H: " << c.height << " W: " << c.width << '\n';
+	os << "Pivot: " << c.pivot << '\n';
+	os << "Right: " << c.right << '\n';
+	os << "Down: " << c.down << '\n';
 
 	return os;
 }

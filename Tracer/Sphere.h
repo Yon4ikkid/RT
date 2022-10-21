@@ -8,8 +8,8 @@ namespace Tracer
 	class Sphere : public ISurface
 	{
 	private:
-		Vector __c;
-		float __r;
+		Vector centre;
+		float radius;
 
 	protected:
 		Vector getNormal(const Vector& p) const override;

@@ -7,7 +7,7 @@ namespace Tracer
 	class ISurface : public IRenderable
 	{
 	private:
-		Material __mat;
+		Material mat;
 
 	protected:
 		virtual Vector getNormal(const Vector& p) const = 0;

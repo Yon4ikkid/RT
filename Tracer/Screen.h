@@ -8,12 +8,12 @@ namespace Tracer
 	class Screen
 	{
 	private:
-		sf::RenderWindow* __rw;
-		sf::Image __i;
-		sf::Texture __t;
-		sf::Sprite __s;
-		unsigned int __width;
-		unsigned int __height;
+		sf::RenderWindow* rw;
+		sf::Image i;
+		sf::Texture t;
+		sf::Sprite s;
+		unsigned int width;
+		unsigned int height;
 
 	public:
 		Screen(unsigned int iwidth, unsigned int iheight);
@@ -21,5 +21,8 @@ namespace Tracer
 
 		void set(const unsigned int x, const unsigned int y, const Pixel& val);
 		void display();
+
+		unsigned int GetHeight() const;
+		unsigned int GetWidth() const;
 	};
 }

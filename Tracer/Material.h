@@ -10,10 +10,11 @@ namespace Tracer
 		// All surfaces in the Tracer are reflective,
 		//	yet the measure of the randomness and softness
 		//	of the reflection varies.
-		float __rdr;
-		int __color[3];
+		float rdr;
+		int color[3];
 
 		Material();
+		Material(const int r, const int g, const int b, const float irdr);
 		Material(const int icolor[3], const float irdr);
 	};
 }

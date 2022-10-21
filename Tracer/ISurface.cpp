@@ -2,9 +2,9 @@
 
 using namespace Tracer;
 
-ISurface::ISurface(const Material& material) : __mat(material) { }
+ISurface::ISurface(const Material& material) : mat(material) { }
 
 Material ISurface::getMaterial() const
 {
-	return __mat;
+	return mat;
 }

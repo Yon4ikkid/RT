@@ -5,8 +5,8 @@ namespace Tracer
 {
 	struct Ray
 	{
-		Vector __o;
-		Vector __d;
+		Vector o;
+		Vector d;
 
 		Ray();
 		Ray(const Vector& iorigin, const Vector& idirection);

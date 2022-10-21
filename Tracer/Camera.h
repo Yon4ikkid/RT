@@ -17,23 +17,23 @@ namespace Tracer
 	class Camera
 	{
 	private:
-		Vector __o; // Origin of rays (focal point)
+		Vector o; // Origin of rays (focal point)
 
 		// The grid through which we cast the rays is a plane,
 		//	thus a point and two vectors provide its whole span.
-		Vector __pivot;
-		Vector __right;
-		Vector __down;
+		Vector pivot;
+		Vector right;
+		Vector down;
 
-		int __width, __height;
-		int __rC = 1, __dC = 1;
+		int width, height;
 
 	public:
+		Camera();
 		Camera(const int iwidth, const int iheight, 
 				const float ifd, const Vector& ifo,
 				const float xRot, const float yRot, const float zRot);
 
-		Ray getNextRay();
+		Ray getRay(const int line, const int column);
 		friend std::ostream& operator<<(std::ostream& os, const Camera& c);
 	};
 }

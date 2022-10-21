@@ -8,9 +8,9 @@ namespace Tracer
 	//	endpoint.
 	struct Vector
 	{
-		float __x;
-		float __y;
-		float __z;
+		float x;
+		float y;
+		float z;
 
 		// Constructors
 		Vector();

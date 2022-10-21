@@ -2,40 +2,29 @@
 
 #include "Camera.h"
 #include "Screen.h"
+#include "Sphere.h"
+#include "Renderer.h"
 
 #define CAM_W 500
 #define CAM_H 500
 #define FOCAL_D 500
+#define THREAD_NUM 5
 
 int main()
 {
-    /*
-    sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!");
-    sf::CircleShape shape(100.f);
-    shape.setFillColor(sf::Color::Green);
-
-    while (window.isOpen())
-    {
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-                window.close();
-        }
-
-        window.clear();
-        window.draw(shape);
-        window.display();
-    }
-    */
-
     Tracer::Vector camSP(250, 0, 250);
     Tracer::Camera c(CAM_W, CAM_H, FOCAL_D, camSP, 0, 0, 0);
     std::cout << "Camera:\n" << c;
 
     Tracer::Screen s(CAM_W, CAM_H);
-    for (int i = 0; i < CAM_W; i++)
-        s.set(i, 50, Tracer::Pixel(255, 255, 255));
+
+    Tracer::Scene scene;
+    scene.camera = &c;
+
+    Tracer::Material m(255, 0, 0, 1);
+    scene.sceneObjects.push_back(new Tracer::Sphere(Tracer::Vector(250, 150, 250), 20, m));
+    Tracer::Renderer r(THREAD_NUM, &scene, &s);
+    r.render();
 
     s.display();
     system("pause");
