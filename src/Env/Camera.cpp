@@ -2,7 +2,7 @@
 #include <exception>
 
 #include "Camera.h"
-#include "Matrix.h"
+#include "../Math/Matrix.h"
 
 #define PI 3.1415926535f 
 #define TO_RAD(D) (D * (PI / 180.0f))

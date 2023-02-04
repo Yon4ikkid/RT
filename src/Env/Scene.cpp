@@ -2,6 +2,7 @@
 
 Tracer::Scene::Scene()
 {
+	
 }
 
 Tracer::Scene::~Scene()

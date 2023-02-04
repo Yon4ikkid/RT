@@ -37,8 +37,3 @@ Pixel& Pixel::operator=(const int value[3])
 
 	return *this;
 }
-
-Tracer::Pixel::operator sf::Color() const
-{
-	return sf::Color(value[0], value[1], value[2], 255);
-}

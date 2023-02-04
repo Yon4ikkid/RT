@@ -2,9 +2,9 @@
 EXE = app
 
 # C compiler
-CC = gcc
+CC = g++
 # linker
-LD = gcc
+LD = g++
 
 # C flags
 CFLAGS = 
@@ -24,9 +24,10 @@ BIN = bin
 OBJ = obj
 SRC = src
 
-SOURCES := $(wildcard $(SRC)/*.c $(SRC)/**/*.c)
-
-OBJECTS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SOURCES))
+SOURCES := $(wildcard $(SRC)/*.cpp $(SRC)/*/*.cpp)
+DIRS := $(wildcard $(SRC)/*)
+DIRS := $(patsubst $(SRC)/%, $(OBJ)/%, $(DIRS))
+OBJECTS := $(patsubst $(SRC)/%.cpp, $(OBJ)/%.o, $(SOURCES))
 
 # include compiler-generated dependency rules
 DEPENDS := $(OBJECTS:.o=.d)
@@ -49,11 +50,14 @@ $(SRC):
 
 $(OBJ):
 	mkdir -p $(OBJ)
+	mkdir -p $(DIRS)
+	
 
 $(BIN):
 	mkdir -p $(BIN)
 
-$(OBJ)/%.o:	$(SRC)/%.c
+$(OBJ)/%.o:	$(SRC)/%.cpp
+	@ls $(OBJ);
 	$(COMPILE.c) $<
 
 # force rebuild

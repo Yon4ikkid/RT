@@ -5,17 +5,27 @@
 using namespace Tracer;
 
 // Default constructor: origin of coordinates
-Vector::Vector() : x(0), y(0), z(0) { }
+Vector::Vector() {
+	for (int i = 0; i < 3; ++i)
+		this->values[i] = 0;
+}
 
-Vector::Vector(const float x, const float y, const float z)
-	: x(x), y(y), z(z) { }
+Vector::Vector(const float x, const float y, const float z) {
+	this->values[0] = x;
+	this->values[1] = y;
+	this->values[2] = z;
+}
 
-Vector::Vector(const Vector& other)
-	: x(other.x), y(other.y), z(other.z) { }
+Vector::Vector(const Vector& other) {
+	for (int i = 0; i < 3; ++i)
+		this->values[i] = other.values[i];
+}
 
-bool Vector::operator==(const Vector& other) const
-{
-	return this->x == other.x && this->y == other.y && this->z == other.z;
+bool Vector::operator==(const Vector& other) const {
+	for (int i = 0; i < 3; ++i)
+		if (this->values[i] != other.values[i])
+			return false;
+	return true;
 }
 
 Vector Vector::operator+(const Vector& other) const

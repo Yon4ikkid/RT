@@ -1,5 +1,5 @@
 #pragma once
-#include "IRenderable.h"
+#include "../Renderer/IRenderable.h"
 #include "Material.h"
 
 namespace Tracer
@@ -7,13 +7,13 @@ namespace Tracer
 	class ISurface : public IRenderable
 	{
 	private:
-		Material mat;
+		Material surface_material;
 
 	protected:
-		virtual Vector getNormal(const Vector& p) const = 0;
+		virtual Vector get_normal(const Vector& p) const = 0;
 
 	public:
 		ISurface(const Material& material);
-		Material getMaterial() const;
+		Material get_material() const;
 	};
 }

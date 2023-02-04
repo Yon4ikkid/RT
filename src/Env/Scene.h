@@ -2,14 +2,14 @@
 #include <vector>
 
 #include "Camera.h"
-#include "IRenderable.h"
+#include "../Render/IRenderable.h"
 
 namespace Tracer
 {
 	struct Scene
 	{
 		std::vector<IRenderable*> sceneObjects;
-		Camera* camera;
+		Camera camera;
 		// Add light sources etc.
 
 		Scene();

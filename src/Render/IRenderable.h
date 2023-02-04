@@ -1,5 +1,4 @@
 #pragma once
-#include "Intersection.h"
 #include "Ray.h"
 
 namespace Tracer
@@ -10,6 +9,7 @@ namespace Tracer
 	class IRenderable
 	{
 	public:
-		virtual bool intersect(const Ray& r, Intersection& out) = 0;
+		virtual bool intersect(const Ray& r, Vector& out) = 0;
+		virtual ~IRenderable();
 	};
 }

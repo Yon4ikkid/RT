@@ -1,5 +1,4 @@
 #pragma once
-#include <SFML/Graphics.hpp>
 
 namespace Tracer
 {
@@ -14,6 +13,5 @@ namespace Tracer
 
 		Pixel& operator=(const Pixel& other);
 		Pixel& operator=(const int ivalue[3]);
-		operator sf::Color() const;
 	};
 }
