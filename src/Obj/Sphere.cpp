@@ -1,9 +1,9 @@
 #include "Sphere.h"
-#include "Ray.h"
+#include "../Render/Ray.h"
 
 using namespace Tracer;
 
-Vector Sphere::getNormal(const Vector& p) const
+Vector Sphere::get_normal(const Vector& p) const
 {
 	return (p - centre).unit();
 }
@@ -11,7 +11,7 @@ Vector Sphere::getNormal(const Vector& p) const
 Sphere::Sphere(const Vector& center, const float radius, const Material& material) 
 	: centre(center), radius(radius), ISurface(material) { }
 
-bool Sphere::intersect(const Ray& r, Intersection& out)
+bool Sphere::intersect(const Ray& r, Vector& out)
 {
 	float a, b, c, det;
 	Vector l = r.o - centre;
@@ -25,9 +25,7 @@ bool Sphere::intersect(const Ray& r, Intersection& out)
 		return false;
 
 	float t = (-b - det) / (2 * a);
-	out.point = r(t);
-	out.normal = getNormal(out.point);
-	out.m = getMaterial();
+	out = r(t);
 
 	return true;
 }

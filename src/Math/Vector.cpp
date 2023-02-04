@@ -98,6 +98,6 @@ Vector& Vector::operator*=(const float c)
 
 std::ostream& Tracer::operator<<(std::ostream& os, const Vector& v)
 {
-	os << '(' << v.x << ',' << v.y << ',' << v.z << ')';
+	os << '(' << v[0] << ',' << v[1] << ',' << v[2] << ')';
 	return os;
 }

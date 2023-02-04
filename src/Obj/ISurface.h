@@ -1,5 +1,5 @@
 #pragma once
-#include "../Renderer/IRenderable.h"
+#include "../Render/IRenderable.h"
 #include "Material.h"
 
 namespace Tracer

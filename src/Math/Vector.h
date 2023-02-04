@@ -11,6 +11,7 @@ namespace Tracer
 	struct Vector : public VectorExpression<Vector>
 	{
 		float values[3];
+		float x,y,z;
 
 		// Constructors
 		Vector();
@@ -24,18 +25,18 @@ namespace Tracer
 		float& operator[](const size_t i);
 
 		// Operator overload
-		// bool operator==(const Vector& other) const;
-		// Vector operator+(const Vector& other) const;
-		// Vector operator-(const Vector& other) const;
-		// float operator*(const Vector& other) const;
-		// Vector operator*(const float c) const;
-		// Vector unit() const;
-		// float norm() const;
+		bool operator==(const Vector& other) const;
+		Vector operator+(const Vector& other) const;
+		Vector operator-(const Vector& other) const;
+		float operator*(const Vector& other) const;
+		Vector operator*(const float c) const;
+		Vector unit() const;
+		float norm() const;
 
-		// Vector& operator=(const Vector& other);
-		// Vector& operator+=(const Vector& other);
-		// Vector& operator-=(const Vector& other);
-		// Vector& operator*=(const float c);
+		Vector& operator=(const Vector& other);
+		Vector& operator+=(const Vector& other);
+		Vector& operator-=(const Vector& other);
+		Vector& operator*=(const float c);
 
 		friend std::ostream& operator<<(std::ostream& os, const Vector& v);
 	};

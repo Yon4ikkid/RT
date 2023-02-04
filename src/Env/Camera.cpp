@@ -56,7 +56,7 @@ Camera::Camera(const int iwidth, const int iheight, const float ifd,
 	this->pivot = a;
 }
 
-Ray Tracer::Camera::getRay(const int line, const int column)
+Ray Tracer::Camera::get_ray(const int line, const int column)
 {
 	if (line > this->height || column > this->width || line <= 0 || column <= 0)
 		throw std::runtime_error("Ray request out of camera bounds");

@@ -68,7 +68,7 @@ Vector Tracer::Matrix::operator*(const Vector& vec) const
 	float ve[3];
 
 	for (int i = 0; i < 3; i++)
-		ve[i] = vec.x * v[i][0] + vec.y * v[i][1] + vec.z * v[i][2];
+		ve[i] = vec[0] * v[i][0] + vec[1] * v[i][1] + vec[2] * v[i][2];
 
 	return Vector(ve[0], ve[1], ve[2]);
 }

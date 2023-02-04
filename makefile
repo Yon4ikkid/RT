@@ -57,7 +57,6 @@ $(BIN):
 	mkdir -p $(BIN)
 
 $(OBJ)/%.o:	$(SRC)/%.cpp
-	@ls $(OBJ);
 	$(COMPILE.c) $<
 
 # force rebuild
