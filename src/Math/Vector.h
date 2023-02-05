@@ -1,25 +1,27 @@
+/**
+ * @file Vector.h
+ * @author Yon Kidalov (yon4ikkid@gmail.com)
+ * @brief Defines the Vector class along with the expressions
+ * @version 0.1
+ * @date 05-02-2023
+ * 
+ * @copyright Copyright (c) 2023
+ * 
+ */
+
 #pragma once
 #include <iostream>
 
 namespace Tracer
 {
-	template <typename T>
-	struct VectorExpression {
-		float operator[](const size_t i) const;
-	};
-
-	struct Vector : public VectorExpression<Vector>
+	struct Vector
 	{
-		float values[3];
 		float x,y,z;
 
 		// Constructors
 		Vector();
 		Vector(const float ix, const float iy, const float iz);
 		Vector(const Vector& other);
-
-		template <typename T>
-		Vector(const VectorExpression<T>& expression);
 
 		float operator[](const size_t i) const;
 		float& operator[](const size_t i);

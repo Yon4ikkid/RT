@@ -1,3 +1,14 @@
+/**
+ * @file Vector.cpp
+ * @author Yon Kidalov (yon4ikkid@gmail.com)
+ * @brief Provides implementation for the Vector class and the derived expressions
+ * @version 0.1
+ * @date 05-02-2023
+ * 
+ * @copyright Copyright (c) 2023
+ * 
+ */
+
 #include <cmath>
 
 #include "Vector.h"
@@ -5,27 +16,15 @@
 using namespace Tracer;
 
 // Default constructor: origin of coordinates
-Vector::Vector() {
-	for (int i = 0; i < 3; ++i)
-		this->values[i] = 0;
-}
+Vector::Vector() : x(0), y(0), z(0) { }
 
-Vector::Vector(const float x, const float y, const float z) {
-	this->values[0] = x;
-	this->values[1] = y;
-	this->values[2] = z;
-}
+Vector::Vector(const float x, const float y, const float z) : x(x), y(y), z(z) { }
 
-Vector::Vector(const Vector& other) {
-	for (int i = 0; i < 3; ++i)
-		this->values[i] = other.values[i];
-}
+Vector::Vector(const Vector& other) : Vector(other.x, other.y, other.z) { }
 
-bool Vector::operator==(const Vector& other) const {
-	for (int i = 0; i < 3; ++i)
-		if (this->values[i] != other.values[i])
-			return false;
-	return true;
+bool Vector::operator==(const Vector& other) const
+{
+	return this->x == other.x && this->y == other.y && this->z == other.z;
 }
 
 Vector Vector::operator+(const Vector& other) const
@@ -98,6 +97,6 @@ Vector& Vector::operator*=(const float c)
 
 std::ostream& Tracer::operator<<(std::ostream& os, const Vector& v)
 {
-	os << '(' << v[0] << ',' << v[1] << ',' << v[2] << ')';
+	os << '(' << v.x << ',' << v.y << ',' << v.z << ')';
 	return os;
 }
