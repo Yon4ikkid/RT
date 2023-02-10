@@ -13,8 +13,18 @@
 
 using namespace Tracer;
 
+/**
+ * @brief Construct a new ISurface::ISurface object
+ * 
+ * @param material 
+ */
 ISurface::ISurface(const Material& material) : surface_material(material) { }
 
+/**
+ * @brief Returns the surface material
+ * 
+ * @return Material 
+ */
 Material ISurface::get_material() const
 {
 	return surface_material;

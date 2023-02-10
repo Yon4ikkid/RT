@@ -20,8 +20,20 @@
 
 using namespace Tracer;
 
-Tracer::Camera::Camera() : height(0), width(0) { }
+Camera::Camera() : height(0), width(0) { }
 
+/**
+ * @brief Construct a new Camera:: Camera object
+ * 
+ * @param iwidth - camera width
+ * @param iheight - camera height
+ * @param ifd - camera focal distance (the distance between the camera position and the viewplane)
+ * @param ifo - the position of the camera
+ * @param xRot - rotation around x axis
+ * @param yRot - rotation around y axis
+ * @param zRot - rotation around z axis
+ * @note rotation is in degrees
+ */
 Camera::Camera(const int iwidth, const int iheight, const float ifd,
 	const Vector& ifo, const float xRot, const float yRot, const float zRot)
 {
@@ -67,7 +79,14 @@ Camera::Camera(const int iwidth, const int iheight, const float ifd,
 	this->pivot = a;
 }
 
-Ray Tracer::Camera::get_ray(const int line, const int column)
+/**
+ * @brief Returns the ray for a pixel given by the line and column in the camera
+ * 
+ * @param line - pixel line
+ * @param column - pixel column
+ * @return Ray - ray passing from the camera origin to the pixel's virtual position
+ */
+Ray Camera::get_ray(const int line, const int column)
 {
 	if (line > this->height || column > this->width || line <= 0 || column <= 0)
 		throw std::runtime_error("Ray request out of camera bounds");
@@ -78,7 +97,14 @@ Ray Tracer::Camera::get_ray(const int line, const int column)
 	return Ray(this->o, (d - this->o).unit());
 }
 
-std::ostream& Tracer::operator<<(std::ostream& os, const Camera& c)
+/**
+ * @brief Stream insertion operator
+ * 
+ * @param os - output stream
+ * @param c - camera
+ * @return std::ostream& 
+ */
+std::ostream& operator<<(std::ostream& os, const Camera& c)
 {
 	os << "H: " << c.height << " W: " << c.width << '\n';
 	os << "Pivot: " << c.pivot << '\n';

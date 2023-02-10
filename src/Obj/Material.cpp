@@ -13,9 +13,27 @@
 
 using namespace Tracer;
 
+/**
+ * @brief Construct a new Material:: Material object - default
+ * 
+ */
 Material::Material() : rdr(0), color{ 255, 0, 0 } { }
 
+/**
+ * @brief Construct a new Tracer:: Material:: Material object
+ * 
+ * @param r - red
+ * @param g - green
+ * @param b - blue
+ * @param irdr - reflective direction randomization factor (diffusive reflection)
+ */
 Tracer::Material::Material(const int r, const int g, const int b, const float irdr) : rdr(irdr), color{ r, g, b } { }
 
+/**
+ * @brief Construct a new Material:: Material object
+ * 
+ * @param color - rgb color
+ * @param rdr - reflective direction randomization factor (diffusive reflection)
+ */
 Material::Material(const int color[3], const float rdr)
 	: Material(color[0], color[1], color[2], rdr) { }

@@ -13,11 +13,27 @@
 
 using namespace Tracer;
 
+/**
+ * @brief Construct a new Ray:: Ray object
+ * 
+ */
 Ray::Ray() { }
 
+/**
+ * @brief Construct a new Ray:: Ray object
+ * 
+ * @param origin - the origin of the ray
+ * @param direction - the direction vector of the ray
+ */
 Ray::Ray(const Vector& origin, const Vector& direction)
 	: o(origin), d(direction) { }
 
+/**
+ * @brief Calculates a point on the ray
+ * 
+ * @param t - direction multiplier
+ * @return Vector - point on ray at o + d * t
+ */
 Vector Ray::operator()(const float t) const
 {
 	return o + d * t;

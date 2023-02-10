@@ -14,14 +14,28 @@
 
 using namespace Tracer;
 
+Sphere::Sphere(const Vector& center, const float radius, const Material& material) 
+	: centre(center), radius(radius), ISurface(material) { }
+
+/**
+ * @brief Returns the normal of the sphere at a given surface point
+ * 
+ * @param p 
+ * @return Vector 
+ */
 Vector Sphere::get_normal(const Vector& p) const
 {
 	return (p - centre).unit();
 }
 
-Sphere::Sphere(const Vector& center, const float radius, const Material& material) 
-	: centre(center), radius(radius), ISurface(material) { }
-
+/**
+ * @brief Checks for intersection with a given ray
+ * 
+ * @param r - target ray
+ * @param out - output vector (assigned if result was true)
+ * @return true - does intersect
+ * @return false - does not intersect
+ */
 bool Sphere::intersect(const Ray& r, Vector& out)
 {
 	float a, b, c, det;

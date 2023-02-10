@@ -15,6 +15,10 @@
 
 using namespace Tracer;
 
+/**
+ * @brief Construct a new Matrix:: Matrix object
+ * 
+ */
 Matrix::Matrix()
 {
 	for (int i = 0; i < 3; i++)
@@ -22,6 +26,11 @@ Matrix::Matrix()
 			v[i][j] = 0;
 }
 
+/**
+ * @brief Copy construct a new Matrix:: Matrix object
+ * 
+ * @param other 
+ */
 Matrix::Matrix(const Matrix& other)
 {
 	for (int i = 0; i < 3; i++)
@@ -29,7 +38,13 @@ Matrix::Matrix(const Matrix& other)
 			this->v[i][j] = other.v[i][j];
 }
 
-Matrix Tracer::Matrix::operator+(const Matrix& other) const
+/**
+ * @brief Matrix addition operator overload
+ * 
+ * @param other 
+ * @return Matrix 
+ */
+Matrix Matrix::operator+(const Matrix& other) const
 {
 	Matrix m(other);
 
@@ -40,7 +55,13 @@ Matrix Tracer::Matrix::operator+(const Matrix& other) const
 	return m;
 }
 
-Matrix Tracer::Matrix::operator-(const Matrix& other) const
+/**
+ * @brief Matrix subtraction operator overload
+ * 
+ * @param other 
+ * @return Matrix 
+ */
+Matrix Matrix::operator-(const Matrix& other) const
 {
 	Matrix m(other);
 
@@ -51,7 +72,13 @@ Matrix Tracer::Matrix::operator-(const Matrix& other) const
 	return m;
 }
 
-Matrix Tracer::Matrix::operator*(const Matrix& other) const
+/**
+ * @brief Matrix multiplication operator overload
+ * 
+ * @param other 
+ * @return Matrix 
+ */
+Matrix Matrix::operator*(const Matrix& other) const
 {
 	Matrix m;
 
@@ -63,7 +90,13 @@ Matrix Tracer::Matrix::operator*(const Matrix& other) const
 	return m;
 }
 
-Matrix Tracer::Matrix::operator*(const float v) const
+/**
+ * @brief Matrix scalar multiplication operator overload
+ * 
+ * @param v 
+ * @return Matrix 
+ */
+Matrix Matrix::operator*(const float v) const
 {
 	Matrix m(*this);
 
@@ -74,7 +107,13 @@ Matrix Tracer::Matrix::operator*(const float v) const
 	return m;
 }
 
-Vector Tracer::Matrix::operator*(const Vector& vec) const
+/**
+ * @brief Matrix multiplication overload for operations on vectors
+ * 
+ * @param vec 
+ * @return Vector 
+ */
+Vector Matrix::operator*(const Vector& vec) const
 {
 	float ve[3];
 
@@ -84,14 +123,26 @@ Vector Tracer::Matrix::operator*(const Vector& vec) const
 	return Vector(ve[0], ve[1], ve[2]);
 }
 
-Matrix& Tracer::Matrix::operator=(const Matrix& other)
+/**
+ * @brief Copy assignment operator overload
+ * 
+ * @param other 
+ * @return Matrix& 
+ */
+Matrix& Matrix::operator=(const Matrix& other)
 {
 	std::copy(&other.v[0][0], &other.v[0][0] + 9, &this->v[0][0]);
 
 	return *this;
 }
 
-Matrix& Tracer::Matrix::operator+=(const Matrix& other)
+/**
+ * @brief Matrix assignment addition operator overload
+ * 
+ * @param other 
+ * @return Matrix& 
+ */
+Matrix& Matrix::operator+=(const Matrix& other)
 {
 	for (int i = 0; i < 3; i++)
 		for (int j = 0; j < 3; j++)
@@ -100,7 +151,13 @@ Matrix& Tracer::Matrix::operator+=(const Matrix& other)
 	return *this;
 }
 
-Matrix& Tracer::Matrix::operator-=(const Matrix& other)
+/**
+ * @brief Matrix assignment subtraction operator overload
+ * 
+ * @param other 
+ * @return Matrix& 
+ */
+Matrix& Matrix::operator-=(const Matrix& other)
 {
 	for (int i = 0; i < 3; i++)
 		for (int j = 0; j < 3; j++)
@@ -109,7 +166,13 @@ Matrix& Tracer::Matrix::operator-=(const Matrix& other)
 	return *this;
 }
 
-Matrix& Tracer::Matrix::operator*=(const Matrix& other)
+/**
+ * @brief Matrix assignment multiplication operator overload
+ * 
+ * @param other 
+ * @return Matrix& 
+ */
+Matrix& Matrix::operator*=(const Matrix& other)
 {
 	Matrix m;
 
@@ -122,7 +185,13 @@ Matrix& Tracer::Matrix::operator*=(const Matrix& other)
 	return *this;
 }
 
-Matrix& Tracer::Matrix::operator*=(const float c)
+/**
+ * @brief Matrix assignment scalar multiplication operator overload
+ * 
+ * @param c 
+ * @return Matrix& 
+ */
+Matrix& Matrix::operator*=(const float c)
 {
 	for (int i = 0; i < 3; i++)
 		for (int j = 0; j < 3; j++)
