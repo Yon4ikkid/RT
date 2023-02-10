@@ -1,3 +1,14 @@
+/**
+ * @file Camera.cpp
+ * @author Yon Kidalov
+ * @brief Provides implementation for the Camera class
+ * @version 0.1
+ * @date 05-02-2023
+ * 
+ * @copyright Copyright (c) 2023
+ * 
+ */
+
 #include <cmath>
 #include <exception>
 
