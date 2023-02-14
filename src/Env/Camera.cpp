@@ -20,7 +20,7 @@
 
 using namespace Tracer;
 
-Camera::Camera() : height(0), width(0) { }
+Camera::Camera() : width(0), height(0) { }
 
 /**
  * @brief Construct a new Camera:: Camera object
@@ -104,7 +104,7 @@ Ray Camera::get_ray(const int line, const int column)
  * @param c - camera
  * @return std::ostream& 
  */
-std::ostream& operator<<(std::ostream& os, const Camera& c)
+std::ostream& Tracer::operator<<(std::ostream& os, const Camera& c)
 {
 	os << "H: " << c.height << " W: " << c.width << '\n';
 	os << "Pivot: " << c.pivot << '\n';

@@ -19,6 +19,8 @@ namespace Tracer
 {
 	class Camera
 	{
+	friend std::ostream& operator<<(std::ostream& os, const Camera& c);
+
 	private:
 		Vector o;
 		
@@ -27,7 +29,6 @@ namespace Tracer
 		Vector down;
 
 		int width, height;
-
 	public:
 		Camera();
 		Camera(const int iwidth, const int iheight, 
@@ -35,6 +36,5 @@ namespace Tracer
 				const float xRot, const float yRot, const float zRot);
 
 		Ray get_ray(const int line, const int column);
-		friend std::ostream& operator<<(std::ostream& os, const Camera& c);
 	};
 }
