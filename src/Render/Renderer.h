@@ -20,6 +20,8 @@ namespace Tracer
         std::mutex task_mutex;
         std::queue<RenderTask> tasks;
 
+        void worker();
+
     public:
         Renderer();
         void RenderImage();

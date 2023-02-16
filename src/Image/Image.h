@@ -3,14 +3,17 @@
 
 #include "Pixel.h"
 
-class Image
+namespace Tracer
 {
-private:
-    Pixel* pixels;
-    int length;
-    int width;
+    class Image
+    {
+    private:
+        Pixel* pixels;
+        int length;
+        int width;
 
-public:
-    Image(int l, int w);
-    ~Image();
-};
+    public:
+        Image(int l, int w);
+        ~Image();
+    };
+}
