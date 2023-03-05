@@ -4,6 +4,8 @@
 #include <mutex>
 #include <utility>
 
+#include "../Image/Image.h"
+
 namespace Tracer
 {
     struct RenderTask
@@ -24,6 +26,6 @@ namespace Tracer
 
     public:
         Renderer();
-        void RenderImage();
+        void RenderImage(const Image& image);
     };
 }
