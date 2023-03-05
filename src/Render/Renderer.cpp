@@ -5,3 +5,7 @@
 
 using namespace Tracer;
 
+Image RenderScene(const Scene& scene)
+{
+    
+}

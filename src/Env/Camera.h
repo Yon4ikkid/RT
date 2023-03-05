@@ -35,6 +35,8 @@ namespace Tracer
 				const float ifd, const Vector& ifo,
 				const float xRot, const float yRot, const float zRot);
 
+		int get_width() const;
+		int get_height() const;
 		Ray get_ray(const int line, const int column);
 	};
 }
