@@ -1,3 +1,4 @@
+#include "Image/Image.h"
 
 /**
  * @brief Main
@@ -6,7 +7,9 @@
  */
 int main()
 {
-
+    Tracer::Image img(100, 100);
+    img.Save();
+    
     return 0;
 }
 

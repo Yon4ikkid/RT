@@ -10,13 +10,14 @@ namespace Tracer
     {
     private:
         Pixel* pixels;
-        int length;
+        int height;
         int width;
 
     public:
         Image(const int l, const int w);
-        SetPixel(const int r, const int c, Pixel p);
-        SetArea(const std::pair<int,int> anchor, const int l, const int w, const Pixel* pixels);
+        void SetPixel(const int r, const int c, Pixel p);
+        void SetArea(const std::pair<int,int> anchor, const int l, const int w, const Pixel* pixels);
+        void Save();
         ~Image();
     };
 }

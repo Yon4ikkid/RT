@@ -1,21 +1,34 @@
 #include "Image.h"
+#define cimg_display 0
+#include "CImg.h"
 
-Image(const int l, const int w) : length(l), width(w)
+using namespace cimg_library;
+using namespace Tracer;
+
+Image::Image(const int l, const int w) : height(l), width(w)
 {
     this->pixels = new Pixel[l * w];
 }
 
-SetPixel(const int r, const int c, Pixel p)
+void Image::SetPixel(const int r, const int c, Pixel p)
 {
-    this->pixels[c + r * this->width];
+    this->pixels[c + r * this->width] = p;
 }
 
-SetArea(const std::pair<int,int> anchor, const int l, const int w, const Pixel* pixels)
+void Image::SetArea(const std::pair<int,int> anchor, const int l, const int w, const Pixel* pixels)
 {
-
+    for (int i = 0; i < l; i++)
+        for (int j = 0; j < w; j++)
+            this->pixels[anchor.second + j + (anchor.first + i) * this->width] = pixels[j + i * w];
 }
 
-~Image()
+void Image::Save() 
+{
+    CImg<int> image(this->width, this->height, 1, 3, 0);
+    image.save("output.bmp");
+}
+
+Image::~Image()
 {
     delete this->pixels;
 }
