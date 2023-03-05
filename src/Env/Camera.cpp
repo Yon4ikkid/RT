@@ -20,7 +20,7 @@
 
 using namespace Tracer;
 
-Camera::Camera() : width(0), height(0) { }
+Camera::Camera() : width(0), height(0), focalDistance(0) { }
 
 /**
  * @brief Construct a new Camera:: Camera object
@@ -37,6 +37,7 @@ Camera::Camera() : width(0), height(0) { }
 Camera::Camera(const int iwidth, const int iheight, const float ifd,
 	const Vector& ifo, const float xRot, const float yRot, const float zRot)
 {
+	this->focalDistance = ifd;
 	o = ifo;
 	this->width = iwidth;
 	this->height = iheight;
@@ -112,4 +113,14 @@ std::ostream& Tracer::operator<<(std::ostream& os, const Camera& c)
 	os << "Down: " << c.down << '\n';
 
 	return os;
+}
+
+int Camera::get_width() const
+{
+	return this->width;
+}
+
+int Camera::get_height() const
+{
+	return this->height;
 }

@@ -1,4 +1,9 @@
-#include "Image/Image.h"
+#include "Render/Renderer.h"
+#include "Env/Scene.h"
+#include "Obj/Sphere.h"
+#include "Obj/Material.h"
+
+using namespace Tracer;
 
 /**
  * @brief Main
@@ -7,9 +12,12 @@
  */
 int main()
 {
-    Tracer::Image img(100, 100);
-    img.Save();
-    
+    Scene scene;
+    scene.camera = Camera(200, 200, 200, Vector(0,0,0), 0,0,0);
+    scene.sceneObjects.push_back(new Sphere(Vector(0,0,300), 50, Material(255,0,0,0)));
+
+    RenderScene(scene);
+
     return 0;
 }
 

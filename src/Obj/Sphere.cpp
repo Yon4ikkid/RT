@@ -36,7 +36,7 @@ Vector Sphere::get_normal(const Vector& p) const
  * @return true - does intersect
  * @return false - does not intersect
  */
-bool Sphere::intersect(const Ray& r, Vector& out)
+bool Sphere::intersect(const Ray& r, float& out)
 {
 	float a, b, c, det;
 	Vector l = r.o - centre;
@@ -50,7 +50,7 @@ bool Sphere::intersect(const Ray& r, Vector& out)
 		return false;
 
 	float t = (-b - det) / (2 * a);
-	out = r(t);
+	out = t;
 
 	return true;
 }

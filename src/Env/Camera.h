@@ -29,6 +29,7 @@ namespace Tracer
 		Vector down;
 
 		int width, height;
+		float focalDistance;
 	public:
 		Camera();
 		Camera(const int iwidth, const int iheight, 

@@ -1,12 +1,8 @@
 #pragma once
-#include <thread>
-#include <queue>
-#include <mutex>
-#include <utility>
 
-#include "../Image/Image.h"
+#include "../Env/Scene.h"
 
 namespace Tracer
 {
-    Image RenderScene(const Scene& scene);
+    void RenderScene(Scene& scene);
 }
