@@ -2,6 +2,7 @@
 #include "Env/Scene.h"
 #include "Obj/Sphere.h"
 #include "Obj/Material.h"
+#include <iostream>
 
 using namespace Tracer;
 
@@ -13,8 +14,10 @@ using namespace Tracer;
 int main()
 {
     Scene scene;
-    scene.camera = Camera(200, 200, 200, Vector(0,0,0), 0,0,0);
-    scene.sceneObjects.push_back(new Sphere(Vector(0,0,300), 50, Material(255,0,0,0)));
+    scene.camera = Camera(600, 600, 1500, Vector(0,0,0), 0,0,0);
+    scene.sceneObjects.push_back(new Sphere(Vector(0,6000,0), 2, Material(255,0,0,0)));
+
+    // std::cout << scene.camera << std::endl;
 
     RenderScene(scene);
 

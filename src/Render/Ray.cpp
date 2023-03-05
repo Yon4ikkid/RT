@@ -38,3 +38,8 @@ Vector Ray::operator()(const float t) const
 {
 	return o + d * t;
 }
+
+std::ostream& Tracer::operator<<(std::ostream& os, const Ray& r)
+{
+	os << "O: " << r.o << " D: " << r.d << std::endl;
+}

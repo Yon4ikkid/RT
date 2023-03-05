@@ -24,7 +24,10 @@ void Image::SetArea(const std::pair<int,int> anchor, const int l, const int w, c
 
 void Image::Save() 
 {
-    CImg<int> image(this->width, this->height, 1, 3, 0);
+    CImg<unsigned char> image(this->width, this->height, 1, 3, 0);
+    for (int i = 0; i < this->height; i++)
+        for (int j = 0; j < this->width; j++)
+            image.draw_point(i, j, this->pixels[j + i * this->width].value);
     image.save("output.bmp");
 }
 

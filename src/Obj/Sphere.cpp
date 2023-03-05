@@ -11,6 +11,7 @@
 
 #include "Sphere.h"
 #include "../Render/Ray.h"
+#include <cmath>
 
 using namespace Tracer;
 
@@ -49,7 +50,7 @@ bool Sphere::intersect(const Ray& r, float& out)
 	if (det < 0)
 		return false;
 
-	float t = (-b - det) / (2 * a);
+	float t = (-b - sqrt(det)) / (2 * a);
 	out = t;
 
 	return true;

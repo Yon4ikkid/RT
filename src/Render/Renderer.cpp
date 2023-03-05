@@ -26,7 +26,6 @@ void Tracer::RenderScene(Scene& scene)
             if (closest == 0)
                 continue;
             
-            std::cout << "INTERSECTED\n";
             img.SetPixel(i, j, {255,0,0});
         }
 

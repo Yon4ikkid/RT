@@ -94,7 +94,7 @@ Ray Camera::get_ray(const int line, const int column)
 	
 	// Calculate the direction pivot vector of the ray (middle of pixel in space)
 	Vector d = this->pivot + this->right * (column - 0.5f) + this->down * (line - 0.5f);
-	
+
 	return Ray(this->o, (d - this->o).unit());
 }
 

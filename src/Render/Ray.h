@@ -10,6 +10,7 @@
  */
 
 #pragma once
+#include <iostream>
 #include "../Math/Vector.h"
 
 namespace Tracer
@@ -23,5 +24,6 @@ namespace Tracer
 		Ray(const Vector& iorigin, const Vector& idirection);
 
 		Vector operator()(const float t) const;
+		friend std::ostream& operator<<(std::ostream& os, const Ray& r);
 	};
 }
