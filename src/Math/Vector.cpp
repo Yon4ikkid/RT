@@ -100,7 +100,7 @@ Vector Vector::operator*(const float c) const
  */
 Vector Vector::unit() const
 {
-	return *this * (1 / norm());
+	return *this * (1.0f / norm());
 }
 
 /**
@@ -166,9 +166,9 @@ Vector& Vector::operator-=(const Vector& other)
  */
 Vector& Vector::operator*=(const float c)
 {
-	this->x -= c;
-	this->y -= c;
-	this->z -= c;
+	this->x *= c;
+	this->y *= c;
+	this->z *= c;
 
 	return *this;
 }

@@ -14,10 +14,8 @@ using namespace Tracer;
 int main()
 {
     Scene scene;
-    scene.camera = Camera(600, 600, 1500, Vector(0,0,0), 0,0,0);
-    scene.sceneObjects.push_back(new Sphere(Vector(0,6000,0), 2, Material(255,0,0,0)));
-
-    // std::cout << scene.camera << std::endl;
+    scene.camera = Camera(200, 200, 500, Vector(100,-500,100), 0,0,0);
+    scene.sceneObjects.push_back(new Sphere(Vector(100,200,100), 2, Material(255,0,0,0)));
 
     RenderScene(scene);
 

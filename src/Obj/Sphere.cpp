@@ -43,15 +43,14 @@ bool Sphere::intersect(const Ray& r, float& out)
 	Vector l = r.o - centre;
 
 	a = r.d * r.d;
-	b =  2 * (r.d * l);
+	b =  2 * (l * r.d);
 	c = l * l - radius * radius;
 	det = b * b - 4 * a * c;
 
 	if (det < 0)
 		return false;
 
-	float t = (-b - sqrt(det)) / (2 * a);
-	out = t;
+	out = (-b - sqrtf(det)) / (2 * a);
 
 	return true;
 }

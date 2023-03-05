@@ -26,7 +26,7 @@ void Tracer::RenderScene(Scene& scene)
             if (closest == 0)
                 continue;
             
-            img.SetPixel(i, j, {255,0,0});
+            img.SetPixel(i - 1, j - 1, {255,0,0});
         }
 
     img.Save();
