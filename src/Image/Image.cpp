@@ -27,8 +27,10 @@ void Image::Save()
     CImg<int> image(this->width, this->height, 1, 3, 0);
     for (int i = 0; i < this->height; i++)
         for (int j = 0; j < this->width; j++)
-            image.draw_point(j, i, 0, this->pixels[j + i * this->width].value);
-    image.save("output.bmp");
+            for (int k = 0; k < 3; k++)
+                image(j, i, k) = this->pixels[j + i * this->width].value[k];
+            // image.draw_point(j, i, 0, this->pixels[j + i * this->width].value);
+    image.save("output.jpeg");
 }
 
 Image::~Image()

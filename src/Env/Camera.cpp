@@ -34,7 +34,7 @@ Camera::Camera() : width(0), height(0), focalDistance(0) { }
  * @param zRot - rotation around z axis
  * @note rotation is in degrees
  */
-Camera::Camera(const int iwidth, const int iheight, const float ifd,
+Camera::Camera(const int iheight, const int iwidth, const float ifd,
 	const Vector& ifo, const float xRot, const float yRot, const float zRot)
 {
 	this->focalDistance = ifd;
