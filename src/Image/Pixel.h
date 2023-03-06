@@ -24,5 +24,6 @@ namespace Tracer
 
 		Pixel& operator=(const Pixel& other);
 		Pixel& operator=(const int ivalue[3]);
+		Pixel operator*(const float q);
 	};
 }

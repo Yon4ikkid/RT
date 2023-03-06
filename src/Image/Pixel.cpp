@@ -48,3 +48,8 @@ Pixel& Pixel::operator=(const int value[3])
 
 	return *this;
 }
+
+Pixel Pixel::operator*(const float q)
+{
+	return Pixel(this->value[0] * q, this->value[1] * q, this->value[2] * q);
+}

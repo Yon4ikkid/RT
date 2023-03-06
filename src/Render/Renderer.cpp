@@ -35,7 +35,13 @@ void Tracer::RenderScene(Scene& scene)
             
             surf = dynamic_cast<ISurface*>(obj);
             if (surf != nullptr)
-                img.SetPixel(i - 1, j - 1, surf->get_material().color);
+            {
+                Vector p = r(closest);
+                Vector normal = surf->get_normal(p);
+
+                float coef = scene.lightSource->calculate_shading(p, normal, scene.sceneObjects);
+                img.SetPixel(i - 1, j - 1, (Pixel)surf->get_material().color * coef);
+            }
 
             closest = 0;
         }

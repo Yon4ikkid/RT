@@ -93,6 +93,11 @@ Vector Vector::operator*(const float c) const
 	return Vector(x * c, y * c, z * c);
 }
 
+Vector Vector::operator-() const
+{
+	return Vector(-x, -y, -z);
+}
+
 /**
  * @brief Returns the unit vector collinear with the original
  * 

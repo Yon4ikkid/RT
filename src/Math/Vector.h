@@ -32,6 +32,7 @@ namespace Tracer
 		Vector operator-(const Vector& other) const;
 		float operator*(const Vector& other) const;
 		Vector operator*(const float c) const;
+		Vector operator-() const;
 		Vector unit() const;
 		float norm() const;
 

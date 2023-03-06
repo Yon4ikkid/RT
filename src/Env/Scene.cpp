@@ -20,4 +20,5 @@ Tracer::Scene::~Scene()
 {
 	for (auto i = sceneObjects.begin(); i != sceneObjects.end(); i++)
 		delete (*i);
+	delete lightSource;
 }

@@ -14,6 +14,7 @@
 
 #include "Camera.h"
 #include "../Render/IRenderable.h"
+#include "../Lighting/ILight.h"
 
 namespace Tracer
 {
@@ -22,6 +23,7 @@ namespace Tracer
 		std::vector<IRenderable*> sceneObjects;
 		Camera camera;
 		// Add light sources etc.
+		ILight* lightSource;
 
 		Scene();
 		~Scene(); // Scene takes care of freeing the memory of the objects
