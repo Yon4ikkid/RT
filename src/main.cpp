@@ -15,9 +15,9 @@ int main()
 {
     Scene scene;
     scene.camera = Camera(400, 800, 5000, Vector(0,-5000,0), 0,0,0);
-    std::cout << scene.camera << std::endl;
-    // scene.sceneObjects.push_back(new Sphere(Vector(-50,150,0), 5, Material(255,0,0,0)));
-    scene.sceneObjects.push_back(new Sphere(Vector(50,1200,0), 5, Material(0,255,0,0)));
+    // std::cout << scene.camera << std::endl;
+    scene.sceneObjects.push_back(new Sphere(Vector(-50,150,0), 50, Material(255,0,0,0)));
+    scene.sceneObjects.push_back(new Sphere(Vector(40,1200,0), 50, Material(0,255,0,0)));
 
     RenderScene(scene);
 

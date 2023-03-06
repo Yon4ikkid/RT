@@ -21,7 +21,7 @@ void Tracer::RenderScene(Scene& scene)
         {
             r = scene.camera.get_ray(i, j);
 
-            std::cout << r << std::endl;
+            // std::cout << r << std::endl;
             for (int k = 0; k < (int)scene.sceneObjects.size(); k++)
                 if (scene.sceneObjects[k]->intersect(r, t))
                     if (closest == 0 || closest > t)
@@ -36,6 +36,8 @@ void Tracer::RenderScene(Scene& scene)
             surf = dynamic_cast<ISurface*>(obj);
             if (surf != nullptr)
                 img.SetPixel(i - 1, j - 1, surf->get_material().color);
+
+            closest = 0;
         }
 
     img.Save();

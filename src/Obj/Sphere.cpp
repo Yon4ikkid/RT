@@ -40,16 +40,18 @@ Vector Sphere::get_normal(const Vector& p) const
 bool Sphere::intersect(const Ray& r, float& out)
 {
 	float a, b, c, det;
-
+	Vector l = r.o - centre;
 	a = r.d * r.d;
-	b =  2 * (r.o * r.d) - 2 * (centre * r.d);
-	c = centre * centre + r.o * r.o - 2 * (centre * r.o) - radius * radius;
+	b =  2 * (r.d * l);
+	c = l * l - radius * radius;
 	det = b * b - 4 * a * c;
 
 	if (det < 0)
 		return false;
 
 	out = (-b - sqrtf(det)) / (2 * a);
+	if (out < 0)
+		return false;
 
 	return true;
 }
