@@ -97,6 +97,12 @@ Ray Camera::get_ray(const int line, const int column)
 	// std::cout << "PIVOT: " << d << std::endl;
 	return Ray(this->o, (d - this->o).unit());
 }
+/* TODO
+Instead of returning a single ray, the camera should return either:
+- A vector of rays, each is a result of pixel boundary interpolation.
+- A vector of pixel boundaries, which later will be interpolated by the renderer.
+This is required for pixel multisampling.
+*/
 
 /**
  * @brief Stream insertion operator
