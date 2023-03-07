@@ -2,9 +2,9 @@
 
 using namespace Tracer;
 
-Plane::Plane(Vector a, Vector b, Vector c) : ab(b - a), ac(c - a) { }
+Plane::Plane(Vector a, Vector b, Vector c, const Material& material) : ISurface(material), ab(b - a), ac(c - a) { }
 
-Vector Plane::get_normal(const Vector& p)
+Vector Plane::get_normal(const Vector& p) const
 {
     return this->normal;
 }
@@ -12,4 +12,5 @@ Vector Plane::get_normal(const Vector& p)
 bool Plane::intersect(const Ray& r, float& out)
 {
     // Check barycentric coordinates
+    return false;
 }

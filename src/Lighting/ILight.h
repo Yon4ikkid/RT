@@ -1,12 +1,12 @@
 #pragma once
-#include "../Render/Ray.h"
+#include "LightRay.h"
 
 namespace Tracer
 {
     class ILight
     {
     public:
-        virtual Ray get_light_ray(Vector& hitpoint) = 0;
+        virtual LightRay get_light_ray(Vector& hitpoint) = 0;
         virtual ~ILight();
     };
 }

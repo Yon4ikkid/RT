@@ -3,6 +3,7 @@
 #include "../Env/Scene.h"
 #include "../Obj/ISurface.h"
 #include "Ray.h"
+#include "../Lighting/LightRay.h"
 #include <iostream>
 
 using namespace Tracer;
@@ -23,7 +24,8 @@ void Tracer::render_scene(Scene& scene)
     int h = scene.camera.get_height();
     Image img(scene.camera.get_height(), scene.camera.get_width());
 
-    Ray r, lightRay;
+    Ray r;
+    LightRay lightRay;
     IRenderable* obj;
     ISurface* surf;
     Vector p, normal;
@@ -54,7 +56,7 @@ void Tracer::render_scene(Scene& scene)
 
             lightRay = scene.lightSource->get_light_ray(p);
             coef = calculate_shading(lightRay, normal, scene);
-            img.SetPixel(i - 1, j - 1, (Pixel)surf->get_material().color * coef);
+            img.SetPixel(i - 1, j - 1, (Pixel)surf->get_material().color * coef * lightRay.intensity);
         }
 
     img.Save();

@@ -11,8 +11,8 @@ namespace Tracer
         Vector normal;
         
     public:
-        Plane(Vector a, Vector b, Vector c);
+        Plane(Vector a, Vector b, Vector c, const Material& material);
         bool intersect(const Ray& r, float& out) override;
 		Vector get_normal(const Vector& p) const override;
-    }
+    };
 }

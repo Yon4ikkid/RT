@@ -21,7 +21,7 @@ int main()
     scene.sceneObjects.push_back(new Sphere(Vector(-100,150,0), 50, Material(255,0,0,0)));
     scene.sceneObjects.push_back(new Sphere(Vector(100,150,0), 80, Material(0,255,100,0)));
     // scene.lightSource = new DirectionalLight(Vector(1,0,-1));
-    scene.lightSource = new SourceLight(Vector(0, 50, 200));
+    scene.lightSource = new SourceLight(Vector(0, 50, 200), 0.005);
     render_scene(scene);
 
     return 0;

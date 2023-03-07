@@ -2,9 +2,11 @@
 
 using namespace Tracer;
 
-SourceLight::SourceLight(Vector s) : source(s) { }
+SourceLight::SourceLight(Vector s, float ifm) : source(s), intensitfyFalloffModifier(ifm) { }
 
-Ray SourceLight::get_light_ray(Vector& hitpoint)
+LightRay SourceLight::get_light_ray(Vector& hitpoint)
 {
-    return Ray(hitpoint, (source - hitpoint).unit());
+    Vector direction = source - hitpoint;
+    float intensity = std::min(1.0f / (direction.norm() * this->intensitfyFalloffModifier), 1.0f);
+    return LightRay(hitpoint, direction.unit(), intensity);
 }
