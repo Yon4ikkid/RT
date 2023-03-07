@@ -5,23 +5,35 @@
 #include "Ray.h"
 #include <iostream>
 
-void Tracer::RenderScene(Scene& scene)
+using namespace Tracer;
+
+float calculate_shading(Ray r, Vector& n, Scene& scene)
+{
+    float t;
+    for (int k = 0; k < (int)scene.sceneObjects.size(); k++)
+        if (scene.sceneObjects[k]->intersect(r, t))
+            return 0;
+
+    return std::max<float>(0, n * r.d);
+}
+
+void Tracer::render_scene(Scene& scene)
 {
     int w = scene.camera.get_width();
     int h = scene.camera.get_height();
     Image img(scene.camera.get_height(), scene.camera.get_width());
 
-    Ray r;
+    Ray r, lightRay;
     IRenderable* obj;
     ISurface* surf;
-    float closest = 0;
-    float t = 0;
+    Vector p, normal;
+    float closest = 0, t = 0, coef = 0;
     for (int i = 1; i <= h; i++)
         for (int j = 1; j <= w; j++)
         {
+            closest = 0;
             r = scene.camera.get_ray(i, j);
 
-            // std::cout << r << std::endl;
             for (int k = 0; k < (int)scene.sceneObjects.size(); k++)
                 if (scene.sceneObjects[k]->intersect(r, t))
                     if (closest == 0 || closest > t)
@@ -34,16 +46,15 @@ void Tracer::RenderScene(Scene& scene)
                 continue;
             
             surf = dynamic_cast<ISurface*>(obj);
-            if (surf != nullptr)
-            {
-                Vector p = r(closest);
-                Vector normal = surf->get_normal(p);
+            if (surf == nullptr)
+                continue;
+            
+            p = r(closest);
+            normal = surf->get_normal(p);
 
-                float coef = scene.lightSource->calculate_shading(p, normal, scene.sceneObjects);
-                img.SetPixel(i - 1, j - 1, (Pixel)surf->get_material().color * coef);
-            }
-
-            closest = 0;
+            lightRay = scene.lightSource->get_light_ray(p);
+            coef = calculate_shading(lightRay, normal, scene);
+            img.SetPixel(i - 1, j - 1, (Pixel)surf->get_material().color * coef);
         }
 
     img.Save();

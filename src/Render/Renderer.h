@@ -4,5 +4,5 @@
 
 namespace Tracer
 {
-    void RenderScene(Scene& scene);
+    void render_scene(Scene& scene);
 }

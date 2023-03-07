@@ -1,14 +1,12 @@
 #pragma once
-#include "../Math/Vector.h"
-#include "../Render/IRenderable.h"
-#include <vector>
+#include "../Render/Ray.h"
 
 namespace Tracer
 {
     class ILight
     {
     public:
-        virtual float calculate_shading(Vector& point, Vector& normal, std::vector<IRenderable*>& objects) = 0;
+        virtual Ray get_light_ray(Vector& hitpoint) = 0;
         virtual ~ILight();
     };
 }

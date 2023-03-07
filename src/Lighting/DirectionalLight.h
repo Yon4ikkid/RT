@@ -10,6 +10,6 @@ namespace Tracer
 
     public:
         DirectionalLight(Vector direction); 
-        float calculate_shading(Vector& point, Vector& normal, std::vector<IRenderable*>& objects) override;  
+        virtual Ray get_light_ray(Vector& hitpoint) override;
     };
 }

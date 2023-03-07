@@ -3,6 +3,7 @@
 #include "Obj/Sphere.h"
 #include "Obj/Material.h"
 #include <iostream>
+#include "Lighting/SourceLight.h"
 #include "Lighting/DirectionalLight.h"
 
 using namespace Tracer;
@@ -15,12 +16,13 @@ using namespace Tracer;
 int main()
 {
     Scene scene;
-    scene.camera = Camera(400, 800, 5000, Vector(0,-5000,0), 0,0,0);
+    scene.camera = Camera(400, 600, 5000, Vector(0,-5000,0), 0,0,0);
     // std::cout << scene.camera << std::endl;
-    scene.sceneObjects.push_back(new Sphere(Vector(-50,150,0), 50, Material(255,0,0,0)));
-    scene.sceneObjects.push_back(new Sphere(Vector(40,1200,0), 50, Material(0,255,0,0)));
-    scene.lightSource = new DirectionalLight(Vector(1,0,-1));
-    RenderScene(scene);
+    scene.sceneObjects.push_back(new Sphere(Vector(-100,150,0), 50, Material(255,0,0,0)));
+    scene.sceneObjects.push_back(new Sphere(Vector(100,150,0), 80, Material(0,255,100,0)));
+    // scene.lightSource = new DirectionalLight(Vector(1,0,-1));
+    scene.lightSource = new SourceLight(Vector(0, 50, 200));
+    render_scene(scene);
 
     return 0;
 }

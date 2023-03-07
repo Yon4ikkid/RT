@@ -22,7 +22,6 @@ namespace Tracer
 	{
 		std::vector<IRenderable*> sceneObjects;
 		Camera camera;
-		// Add light sources etc.
 		ILight* lightSource;
 
 		Scene();

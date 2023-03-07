@@ -6,16 +6,7 @@ using namespace Tracer;
 
 DirectionalLight::DirectionalLight(Vector d) : direction(d.unit()) { }
 
-float DirectionalLight::calculate_shading(Vector& point, Vector& normal, std::vector<IRenderable*>& objects)
+Ray DirectionalLight::get_light_ray(Vector& hitpoint)
 {
-    // Check for direct block
-    Ray rev(point, -this->direction);
-
-    float t;
-    for (int k = 0; k < (int)objects.size(); k++)
-        if (objects[k]->intersect(rev, t))
-            return 0;
-    
-    // Calculate shading with normal
-    return std::max<float>(0, normal * (-this->direction));
+    return Ray(hitpoint, -this->direction);
 }
