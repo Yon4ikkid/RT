@@ -6,6 +6,8 @@ namespace Tracer
     class Plane : public ISurface
     {
     private:
+        Vector ab;
+        Vector ac;
         Vector normal;
         
     public:
