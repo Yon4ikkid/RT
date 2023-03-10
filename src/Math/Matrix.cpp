@@ -87,7 +87,8 @@ Matrix Matrix::operator*(const Matrix& other) const
 {
 	if (this->width != other.height)
 		throw std::runtime_error("Invalid matrix dimensions for multiplication.");
-	Matrix m(other.width, this->height);
+	
+	Matrix m(this->height, other.width);
 
 	for (int row = 0; row < this->height; row++)
 		for (int col = 0; col < other.width; col++)

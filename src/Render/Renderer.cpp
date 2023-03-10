@@ -44,7 +44,7 @@ void Tracer::render_scene(Scene& scene)
                         obj = scene.sceneObjects[k];
                     }
 
-            if (closest == 0)
+            if (closest == 0) 
                 continue;
             
             surf = dynamic_cast<ISurface*>(obj);
