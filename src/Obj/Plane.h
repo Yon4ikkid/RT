@@ -8,6 +8,7 @@ namespace Tracer
     private:
         Vector ab;
         Vector ac;
+        Vector a;
         Vector normal;
         
     public:
