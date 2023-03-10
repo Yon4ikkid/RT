@@ -39,24 +39,25 @@ bool Plane::intersect(const Ray& r, float& out)
 
 
     out = t;
-    return true;
-    // Vector p = r(t) - a;
+    // return true;
+    Vector p = r(t) - a;
 
-    // Matrix A(2,2);
-    // A.v[0][0] = ab.x;
-    // A.v[0][1] = ac.x;
-    // A.v[1][0] = ab.y;
-    // A.v[1][1] = ac.y;
+    Matrix A(2,2);
+    A.v[0][0] = ab.x;
+    A.v[0][1] = ac.x;
+    A.v[1][0] = ab.y;
+    A.v[1][1] = ac.y;
 
-    // Matrix X(2,1);
-    // X.v[0][0] = p.x;
-    // X.v[1][0] = p.y;
+    Matrix X(2,1);
+    X.v[0][0] = p.x;
+    X.v[1][0] = p.y;
 
-    // Matrix C = A.inverse() * X;
-    // float s = C.v[1][0] + C.v[0][0];
+    Matrix C = A.inverse() * X;
+    float alpha = C.v[0][0], beta = C.v[1][0];
+    float s = alpha + beta;
 
-    // if (std::abs(s) <= 60)
-    //     return true;
+    if (std::abs(s) <= 1 && alpha >= 0 && beta >= 0)
+        return true;
 
     return false;
 }
