@@ -18,8 +18,10 @@ namespace Tracer
 	struct Matrix
 	{
 		float v[3][3];
+		unsigned int width, height;
 
 		Matrix();
+		Matrix(unsigned int w, unsigned int h);
 		Matrix(const Matrix& other);
 
 		Matrix operator+(const Matrix& other) const;

@@ -19,23 +19,28 @@ using namespace Tracer;
  * @brief Construct a new Matrix:: Matrix object
  * 
  */
-Matrix::Matrix()
-{
-	for (int i = 0; i < 3; i++)
-		for (int j = 0; j < 3; j++)
-			v[i][j] = 0;
-}
+Matrix::Matrix() : Matrix(3,3) { }
 
 /**
  * @brief Copy construct a new Matrix:: Matrix object
  * 
  * @param other 
  */
-Matrix::Matrix(const Matrix& other)
+Matrix::Matrix(const Matrix& other) : width(other.width), height(other.height)
 {
-	for (int i = 0; i < 3; i++)
-		for (int j = 0; j < 3; j++)
+	for (int i = 0; i < height; i++)
+		for (int j = 0; j < width; j++)
 			this->v[i][j] = other.v[i][j];
+}
+
+Matrix::Matrix(unsigned int w, unsigned int h) : width(w), height(h)
+{
+	if (width < 1 || width > 3 || height < 1 || height > 3)
+		throw std::runtime_error("Matrix dimensions passed to constructor exceed the implemented limits.");
+	
+	for (int i = 0; i < height; i++)
+		for (int j = 0; j < width; j++)
+			v[i][j] = 0;
 }
 
 /**
@@ -48,8 +53,8 @@ Matrix Matrix::operator+(const Matrix& other) const
 {
 	Matrix m(other);
 
-	for (int i = 0; i < 3; i++)
-		for (int j = 0; j < 3; j++)
+	for (int i = 0; i < height; i++)
+		for (int j = 0; j < width; j++)
 			m.v[i][j] += this->v[i][j];
 
 	return m;
@@ -63,11 +68,11 @@ Matrix Matrix::operator+(const Matrix& other) const
  */
 Matrix Matrix::operator-(const Matrix& other) const
 {
-	Matrix m(other);
+	Matrix m(*this);
 
-	for (int i = 0; i < 3; i++)
-		for (int j = 0; j < 3; j++)
-			m.v[i][j] -= this->v[i][j];
+	for (int i = 0; i < height; i++)
+		for (int j = 0; j < width; j++)
+			m.v[i][j] -= other.v[i][j];
 
 	return m;
 }
