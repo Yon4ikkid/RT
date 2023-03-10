@@ -117,6 +117,7 @@ std::ostream& Tracer::operator<<(std::ostream& os, const Camera& c)
 	os << "Pivot: " << c.pivot << '\n';
 	os << "Right: " << c.right << '\n';
 	os << "Down: " << c.down << '\n';
+	os << "Origin: " << c.o << '\n';
 
 	return os;
 }

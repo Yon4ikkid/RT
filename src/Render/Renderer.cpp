@@ -8,11 +8,11 @@
 
 using namespace Tracer;
 
-float calculate_shading(Ray r, Vector& n, Scene& scene)
+float calculate_shading(Ray r, Vector& n, Scene& scene, IRenderable* exception)
 {
     float t;
     for (int k = 0; k < (int)scene.sceneObjects.size(); k++)
-        if (scene.sceneObjects[k]->intersect(r, t))
+        if (scene.sceneObjects[k] != exception && scene.sceneObjects[k]->intersect(r, t))
             return 0;
 
     return std::max<float>(0, n * r.d);
@@ -53,9 +53,9 @@ void Tracer::render_scene(Scene& scene)
             
             p = r(closest);
             normal = surf->get_normal(p);
-
+            
             lightRay = scene.lightSource->get_light_ray(p);
-            coef = calculate_shading(lightRay, normal, scene);
+            coef = calculate_shading(lightRay, normal, scene, obj);
             img.SetPixel(i - 1, j - 1, (Pixel)surf->get_material().color * coef * lightRay.intensity);
         }
 

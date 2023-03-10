@@ -19,7 +19,6 @@ Plane::Plane(Vector a, Vector b, Vector c, const Material& material) : ISurface(
     Matrix N = A.inverse() * X;
 
     this->normal = Vector(N.v[0][0], N.v[1][0], 1).unit();
-    std::cout << normal << std::endl;
 }
 
 Vector Plane::get_normal(const Vector& p) const
@@ -29,7 +28,6 @@ Vector Plane::get_normal(const Vector& p) const
 
 bool Plane::intersect(const Ray& r, float& out)
 {
-    Vector p;
     float div = normal * r.d;
 
     if (div == 0)
@@ -39,8 +37,11 @@ bool Plane::intersect(const Ray& r, float& out)
     if (t < 0)
         return false;
 
+
     out = t;
     return true;
+    // Vector p = r(t) - a;
+
     // Matrix A(2,2);
     // A.v[0][0] = ab.x;
     // A.v[0][1] = ac.x;
@@ -52,10 +53,9 @@ bool Plane::intersect(const Ray& r, float& out)
     // X.v[1][0] = p.y;
 
     // Matrix C = A.inverse() * X;
+    // float s = C.v[1][0] + C.v[0][0];
 
-    // float s = C.v[0][0] + C.v[1][0];
-
-    // if (s >= 0 && s <= 1)
+    // if (std::abs(s) <= 60)
     //     return true;
 
     return false;
