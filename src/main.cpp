@@ -16,7 +16,7 @@ using namespace Tracer;
  */
 int main()
 {
-    const float focus = 1000;
+    const float focus = 6000;
     Scene scene;
     scene.camera = Camera(1080, 1920, focus, Vector(0,-focus,0), 0,0,0);
     std::cout << scene.camera << std::endl;

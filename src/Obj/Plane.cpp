@@ -39,7 +39,7 @@ bool Plane::intersect(const Ray& r, float& out)
 
 
     out = t;
-    // return true;
+
     Vector p = r(t) - a;
 
     Matrix A(2,2);
