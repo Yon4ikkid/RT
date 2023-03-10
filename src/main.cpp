@@ -16,18 +16,18 @@ using namespace Tracer;
  */
 int main()
 {
-    // Scene scene;
-    // scene.camera = Camera(400, 600, 5000, Vector(0,-5000,0), 0,0,0);
-    // // std::cout << scene.camera << std::endl;
+    Scene scene;
+    scene.camera = Camera(1080, 1920, 5000, Vector(0,-5000,0), 0,0,0);
+
     // scene.sceneObjects.push_back(new Sphere(Vector(-100,150,0), 50, Material(255,0,0,0)));
     // scene.sceneObjects.push_back(new Sphere(Vector(100,150,0), 80, Material(0,255,100,0)));
-    // // scene.lightSource = new DirectionalLight(Vector(1,0,-1));
-    // scene.lightSource = new SourceLight(Vector(0, 50, 200), 0.005);
-    // render_scene(scene);
+    Plane* p = new Plane(Vector(-500, 800, -860), Vector(0, 0, -860), Vector(500, 800, -860), Material(140,200,140,0));
+    scene.sceneObjects.push_back(p);
 
-    // PLANE NORMAL UNITTEST
-    // Plane p(Vector(0,0,0), Vector(0,1,0), Vector(1,1,1), Material(0,255,0,0));
-    // std::cout << p.get_normal(Vector(0,0,0)) << std::endl;
+    scene.lightSource = new DirectionalLight(Vector(0,0,-1));
+    // scene.lightSource = new SourceLight(Vector(0, 50, 200), 700);
+
+    render_scene(scene);
 
     return 0;
 }

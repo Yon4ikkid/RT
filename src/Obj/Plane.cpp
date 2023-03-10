@@ -1,5 +1,6 @@
 #include "Plane.h"
 #include "../Math/Matrix.h"
+#include <iostream>
 
 using namespace Tracer;
 
@@ -17,7 +18,8 @@ Plane::Plane(Vector a, Vector b, Vector c, const Material& material) : ISurface(
 
     Matrix N = A.inverse() * X;
 
-    this->normal = Vector(N.v[0][0], N.v[1][0], 1);
+    this->normal = Vector(N.v[0][0], N.v[1][0], 1).unit();
+    std::cout << normal << std::endl;
 }
 
 Vector Plane::get_normal(const Vector& p) const
@@ -38,23 +40,23 @@ bool Plane::intersect(const Ray& r, float& out)
         return false;
 
     out = t;
-    
-    Matrix A(2,2);
-    A.v[0][0] = ab.x;
-    A.v[0][1] = ac.x;
-    A.v[1][0] = ab.y;
-    A.v[1][1] = ac.y;
+    return true;
+    // Matrix A(2,2);
+    // A.v[0][0] = ab.x;
+    // A.v[0][1] = ac.x;
+    // A.v[1][0] = ab.y;
+    // A.v[1][1] = ac.y;
 
-    Matrix X(2,1);
-    X.v[0][0] = p.x;
-    X.v[1][0] = p.y;
+    // Matrix X(2,1);
+    // X.v[0][0] = p.x;
+    // X.v[1][0] = p.y;
 
-    Matrix C = A.inverse() * X;
+    // Matrix C = A.inverse() * X;
 
-    float s = C.v[0][0] + C.v[1][0];
+    // float s = C.v[0][0] + C.v[1][0];
 
-    if (s >= 0 && s <= 1)
-        return true;
+    // if (s >= 0 && s <= 1)
+    //     return true;
 
     return false;
 }

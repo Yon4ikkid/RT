@@ -7,10 +7,10 @@ namespace Tracer
     {
     private:
         Vector source;
-        float intensitfyFalloffModifier;
+        float maxDistance;
 
     public:
-        SourceLight(Vector s, float ifm);
+        SourceLight(Vector s, float md);
         virtual LightRay get_light_ray(Vector& hitpoint) override;
     };
 }

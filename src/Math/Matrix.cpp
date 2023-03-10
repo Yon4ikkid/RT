@@ -85,11 +85,13 @@ Matrix Matrix::operator-(const Matrix& other) const
  */
 Matrix Matrix::operator*(const Matrix& other) const
 {
+	if (this->width != other.height)
+		throw std::runtime_error("Invalid matrix dimensions for multiplication.");
 	Matrix m(other.width, this->height);
 
-	for (int row = 0; row < 3; row++)
-		for (int col = 0; col < 3; col++)
-			for (int element = 0; element < 3; element++)
+	for (int row = 0; row < this->height; row++)
+		for (int col = 0; col < other.width; col++)
+			for (int element = 0; element < this->width; element++)
 				m.v[row][col] += this->v[row][element] * other.v[element][col];
 
 	return m;
@@ -136,12 +138,16 @@ Matrix Matrix::inverse() const
 	Matrix m(2,2);
 
 	float a = this->v[0][0], b = this->v[0][1], c = this->v[1][0], d = this->v[1][1];
+	float det = (a * d - b * c);
+	if (det == 0)
+		throw std::runtime_error("Determinant was zero during 2x2 matrix inversion.");
+
 	m.v[0][0] = d;
 	m.v[0][1] = -b;
 	m.v[1][0] = -c;
 	m.v[1][1] = a;
 
-	m *= 1.0f / (a * d - b * c);
+	m *= 1.0f / det;
 
 	return m;
 }

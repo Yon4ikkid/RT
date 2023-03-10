@@ -29,7 +29,7 @@ void Image::Save()
         for (int j = 0; j < this->width; j++)
             for (int k = 0; k < 3; k++)
                 image(j, i, k) = this->pixels[j + i * this->width].value[k];
-    image.save("output.bmp");
+    image.save("output.jpeg");
 }
 
 Image::~Image()

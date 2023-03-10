@@ -32,7 +32,7 @@ namespace Tracer
 		float focalDistance;
 	public:
 		Camera();
-		Camera(const int iwidth, const int iheight, 
+		Camera(const int iheight, const int iwidth, 
 				const float ifd, const Vector& ifo,
 				const float xRot, const float yRot, const float zRot);
 
