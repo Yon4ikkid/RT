@@ -29,6 +29,7 @@ namespace Tracer
 		Matrix operator*(const Matrix& other) const;
 		Matrix operator*(const float v) const;
 		Vector operator*(const Vector& vec) const;
+		Matrix inverse() const;
 
 		Matrix& operator=(const Matrix& other);
 		Matrix& operator+=(const Matrix& other);

@@ -85,7 +85,7 @@ Matrix Matrix::operator-(const Matrix& other) const
  */
 Matrix Matrix::operator*(const Matrix& other) const
 {
-	Matrix m;
+	Matrix m(other.width, this->height);
 
 	for (int row = 0; row < 3; row++)
 		for (int col = 0; col < 3; col++)
@@ -126,6 +126,24 @@ Vector Matrix::operator*(const Vector& vec) const
 		ve[i] = vec.x * v[i][0] + vec.y * v[i][1] + vec.z * v[i][2];
 
 	return Vector(ve[0], ve[1], ve[2]);
+}
+
+Matrix Matrix::inverse() const
+{
+	if (this->height != 2 && this->width != 2)
+		throw std::runtime_error("Cannot inverse a matrix that is not 2x2 in size.");
+	
+	Matrix m(2,2);
+
+	float a = this->v[0][0], b = this->v[0][1], c = this->v[1][0], d = this->v[1][1];
+	m.v[0][0] = d;
+	m.v[0][1] = -b;
+	m.v[1][0] = -c;
+	m.v[1][1] = a;
+
+	m *= 1.0f / (a * d - b * c);
+
+	return m;
 }
 
 /**
