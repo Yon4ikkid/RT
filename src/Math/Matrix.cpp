@@ -33,7 +33,7 @@ Matrix::Matrix(const Matrix& other) : width(other.width), height(other.height)
 			this->v[i][j] = other.v[i][j];
 }
 
-Matrix::Matrix(unsigned int w, unsigned int h) : width(w), height(h)
+Matrix::Matrix(unsigned int h, unsigned int w) : width(w), height(h)
 {
 	if (width < 1 || width > 3 || height < 1 || height > 3)
 		throw std::runtime_error("Matrix dimensions passed to constructor exceed the implemented limits.");

@@ -21,7 +21,7 @@ namespace Tracer
 		unsigned int width, height;
 
 		Matrix();
-		Matrix(unsigned int w, unsigned int h);
+		Matrix(unsigned int h, unsigned int w);
 		Matrix(const Matrix& other);
 
 		Matrix operator+(const Matrix& other) const;
