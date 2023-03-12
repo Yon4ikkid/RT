@@ -23,7 +23,7 @@ int main()
     scene.sceneObjects.push_back(new Sphere(Vector(-400,140,50), 90, Material(255,0,0,0)));
     scene.sceneObjects.push_back(new Sphere(Vector(300,150,-100), 140, Material(0,255,100,0)));
     // Plane* p = new Plane(Vector(-420, 30, -200), Vector(-420, 530, -200), Vector(350, 280, -200), Material(140,200,140,0));
-    Plane* p = new Plane(Vector(-900, 0, -260), Vector(-900,1000,-160), Vector(800,50,-250), Material(140,200,140,0));
+    // Plane* p = new Plane(Vector(-900, 0, -260), Vector(-900,1000,-160), Vector(800,50,-250), Material(140,200,140,0));
     std::cout << p->get_normal(Vector()) << '\n';
     scene.sceneObjects.push_back(p);
 
