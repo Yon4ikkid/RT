@@ -5,12 +5,15 @@ namespace Tracer
 {
     class Plane : public ISurface
     {
-    protected:
+    private:
         Vector p, normal;
         
+    protected:
+        Vector get_normal(const Vector& p) const override;
+
     public:
         Plane(Vector p, Vector n, const Material& material);
+        Vector get_pivot() const;
         bool intersect(const Ray& r, Intersection& out) override;
-		Vector get_normal(const Vector& p) const override;
     };
 }

@@ -2,6 +2,7 @@
 #include "../Image/Image.h"
 #include "../Env/Scene.h"
 #include "../Obj/ISurface.h"
+#include "Intersection.h"
 #include "Ray.h"
 #include "../Lighting/LightRay.h"
 #include <iostream>
@@ -27,8 +28,7 @@ void Tracer::render_scene(Scene& scene)
     Ray r;
     LightRay lightRay;
     IRenderable* obj;
-    ISurface* surf;
-    Vector p, normal;
+    Intersection intersection;
     float closest = 0, t = 0, coef = 0;
     for (int i = 1; i <= h; i++)
         for (int j = 1; j <= w; j++)
@@ -47,10 +47,7 @@ void Tracer::render_scene(Scene& scene)
             if (closest == 0) 
                 continue;
             
-            surf = dynamic_cast<ISurface*>(obj);
-            if (surf == nullptr)
-                continue;
-            
+            obj->intersect
             p = r(closest);
             normal = surf->get_normal(p);
             

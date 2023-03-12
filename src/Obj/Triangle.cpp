@@ -21,12 +21,12 @@ Triangle::Triangle(Vector a, Vector b, Vector c, const Material& material) : ISu
     this->plane = Plane(a, Vector(N.v[0][0], N.v[1][0], 1).unit(), material)
 }
 
-bool Triangle::intersect(const Ray& r, float& out) override
+bool Triangle::intersect(const Ray& r, Intersection& out) override
 {
-    if (!Plane::intersect(r, out))
+    if (!this->plane.intersect(r, out))
         return false;
 
-    Vector p = r(t) - a;
+    Vector p = out.p - a;
 
     Matrix A(2,2);
     A.v[0][0] = ab.x;
@@ -46,9 +46,4 @@ bool Triangle::intersect(const Ray& r, float& out) override
         return true;
     
     return false;
-}
-
-Vector Triangle::get_normal(const Vector& p) const override
-{
-
 }

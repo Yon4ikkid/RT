@@ -11,7 +11,6 @@ namespace Tracer
 
     public:
         Triangle(const Vector a, const Vector b, const Vector c, const Material& material);
-        bool intersect(const Ray& r, float& out) override;
-		// Vector get_normal(const Vector& p) const override;
+        bool intersect(const Ray& r, Intersection& out) override;
     }
 }

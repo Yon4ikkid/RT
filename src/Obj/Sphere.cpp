@@ -49,11 +49,13 @@ bool Sphere::intersect(const Ray& r, Intersection& out)
 	if (det < 0)
 		return false;
 
-	out = (-b - sqrtf(det)) / (2 * a);
-	out.p = (-b - sqrtf(det)) / (2 * a);
-	out.n = 
-	if (out < 0)
+	float t = (-b - sqrtf(det)) / (2 * a)
+	if (t < 0)
 		return false;
+
+	out.p = r(t);
+	out.n = get_normal(out.p);
+	out.m = this->get_material();
 
 	return true;
 }
