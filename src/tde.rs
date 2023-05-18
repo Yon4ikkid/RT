@@ -80,7 +80,9 @@ impl Intersectable for Plane {
 }
 
 pub struct Triangle {
-
+    pub p: Plane,
+    pub u: Vector,
+    pub v: Vector,
 }
 
 pub struct Circle {
