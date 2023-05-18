@@ -36,7 +36,7 @@ pub struct Sphere {
 }
 
 impl Intersectable for Sphere {
-    fn intersect(&self, r: &Ray) -> (bool, Vector,Vector) {
+    fn intersect(&self, r: &Ray) -> (bool, Vector, Vector) {
         let  (a, b, c, det): (f64,f64,f64,f64);
         let l: Vector = r.o - self.c;
         a = r.d * r.d;
@@ -59,7 +59,24 @@ impl Intersectable for Sphere {
 }
 
 pub struct Plane {
+    pub a: Vector,
+    pub n: Vector,
+}
 
+impl Intersectable for Plane {
+    fn intersect(&self, r: &Ray) -> (bool, Vector, Vector) {
+        let div: f64 = self.n * r.d;
+        if div == 0.0 {
+            return (false, Vector::default(), Vector::default());
+        }
+
+        let t: f64 = (self.n * (self.a - r.o)) / div;
+        if t < 0.1 {
+            return (false, Vector::default(), Vector::default());
+        }
+
+        return (true, r.get_point(t), self.n);
+    }
 }
 
 pub struct Triangle {
