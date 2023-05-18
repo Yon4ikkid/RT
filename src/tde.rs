@@ -86,7 +86,8 @@ pub struct Triangle {
 }
 
 pub struct Circle {
-
+    pub p: Plane,
+    pub r: f64,
 }
 
 pub struct BiconvexLens {

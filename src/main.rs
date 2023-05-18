@@ -17,7 +17,7 @@ fn main() {
                                             //  lightsource: Box::new(PointLight {c: Color { r: 1.0, g: 1.0, b: 1.0 } , o: Vector { x: 0.0, y: 50.0, z: 70.0 }, d: 1500.0 }) };
                                             lightsource: Box::new(DirectionalLight {c: Color { r: 0.0, g: 0.2, b: 0.2 } , d: Vector { x: 3.0, y: 1.01, z: -2.5 }.unit()}) };
     let o: Object = Object { m: Material { base_color: Color {r: 0.8, g: 0.4, b: 0.3}, 
-        refractive_index: 10.76, reflection_ratio: 0.8}, s: Box::new(Sphere { c: Vector { x: 0.0, y: 90.0, z: 0.0 }, r: 40.0 }) };
+        refractive_index: 0.86, reflection_ratio: 0.8}, s: Box::new(Sphere { c: Vector { x: 0.0, y: 90.0, z: 0.0 }, r: 40.0 }) };
     let o1: Object = Object { m: Material { base_color: Color {r: 1.0, g: 0.0, b: 0.2}, 
         refractive_index: 1.67, reflection_ratio: 0.8}, s: Box::new(Sphere { c: Vector { x: 20.0, y: 250.0, z: -14.0 }, r: 35.0 }) };
     let o2: Object = Object { m: Material { base_color: Color {r: 0.05, g: 0.076, b: 0.02}, 
