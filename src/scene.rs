@@ -126,11 +126,18 @@ impl Scene {
         let (light_dir, light_intensity, mut light_color) = self.lightsource.get_light(p);
         light_color *= light_intensity;
         
-        let nl: f64 = light_dir * n;
-        let nd: f64 = light_dir * ray.d;
-        if nl.is_sign_negative() {
-            let s: f64 = 1.0 - f64::abs(nl.abs() - nd.abs());
-            light_color *= s;
+        let superficial: Vector = -(ray.d + ((-ray.d) * n) * n).unit();
+
+        let light_superficial: f64 =  -(light_dir * superficial);
+        let light_normal: f64 = -(light_dir * n);
+        let ray_superficial: f64 = -(ray.d * superficial);
+        let ray_normal: f64 = -(ray.d * n);
+
+        if light_normal.is_sign_positive() && light_superficial.is_sign_negative() {
+            let superficial_intake: f64 = f64::min(ray_superficial, light_superficial);
+            let normal_intake: f64 = f64::min(ray_normal, light_normal);
+
+            light_color *= (normal_intake/ray_normal).abs() * (superficial_intake/ray_superficial).abs();
         } else {
             light_color *= 0.0;
         }
