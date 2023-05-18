@@ -18,7 +18,11 @@ impl Vector {
     }
 
     pub fn unit(self) -> Vector {
-        return self / self.norm();
+        let nr = self.norm();
+        if nr == 0.0 {
+            return Vector::default();
+        }
+        return self / nr;
     }
 
     pub fn norm(self) -> f64 {

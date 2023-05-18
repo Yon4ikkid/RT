@@ -49,7 +49,7 @@ impl Intersectable for Sphere {
         }
 
         let t: f64 = (-b - det.sqrt()) / (2.0 * a);
-        if t < 0.0 {
+        if t < 0.1 {
             return (false, Vector::default(), Vector::default());
         }
 
