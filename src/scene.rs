@@ -2,6 +2,7 @@
 use crate::math::Vector;
 use crate::math::Matrix;
 use crate::rendering::Color;
+use crate::rendering::Lightsource;
 use crate::rendering::Object;
 use crate::tde::Ray;
 use std::vec::Vec;
@@ -11,6 +12,7 @@ pub struct Scene {
     pub ambient_light_color: Color,
     pub camera: Camera,
     pub objects: Vec<Object>,
+    pub lightsource: Box<dyn Lightsource>,
 }
 
 pub struct Camera {
@@ -88,13 +90,15 @@ impl Camera {
 
 impl Scene { 
     fn trace_ray(&self, ray: Ray, trace_limit: u64) -> Color {
-        let (mut d, mut p, mut n): (bool, Vector, Vector);
+        let (mut d, mut p, mut n): (bool, Vector, Vector) = (false, Vector::default(), Vector::default());
         let mut min_distance: f64;
         let mut cur_distance: f64;
         let mut ray_segment: Vector;
         let mut incid: std::option::Option<&Object>;
         let mut out_color: Color = Color { r: 1.0, g: 1.0, b: 1.0};
 
+        p = ray.o;
+        n = ray.d;
         min_distance = 0.0;
         incid = None;
         for object in &self.objects {
@@ -110,15 +114,29 @@ impl Scene {
         }
 
         if incid.is_some() {
-            out_color *= incid.unwrap().m.base_color;
+            out_color = incid.unwrap().m.base_color;
             // Reflect and refract
+        }
 
-        } else {
-            out_color *= self.ambient_light_color;
+        if (ray.d * n).is_sign_positive() {
+            n = -n;
         }
 
         // Calculate lightsource contribution
+        let (light_dir, light_intensity, mut light_color) = self.lightsource.get_light(p);
+        light_color *= light_intensity;
         
+        let nl: f64 = light_dir * n;
+        let nd: f64 = light_dir * ray.d;
+        if nl.is_sign_negative() {
+            let s: f64 = 1.0 - f64::abs(nl.abs() - nd.abs());
+            light_color *= s;
+        } else {
+            light_color *= 0.0;
+        }
+        light_color += self.ambient_light_color;
+        out_color *= light_color;
+
         return out_color;
     }
 
@@ -137,9 +155,9 @@ impl Scene {
                 ray = self.camera.get_ray(row as f64, col as f64);
                 out_color = self.trace_ray(ray, trace_limit);
 
-                r = (out_color.r * 255.0) as u8;
-                g = (out_color.g * 255.0) as u8;
-                b = (out_color.b * 255.0) as u8;
+                r = u8::min((out_color.r * 255.0) as u8, 255);
+                g = u8::min((out_color.g * 255.0) as u8, 255);
+                b = u8::min((out_color.b * 255.0) as u8, 255);
                 image.put_pixel(col as u32, row as u32, Rgb([r, g, b]));
             } 
         }

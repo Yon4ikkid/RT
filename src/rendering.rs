@@ -10,6 +10,25 @@ pub struct Color {
     pub b: f64,
 }
 
+impl ops::Add for Color {
+    type Output = Color;
+
+    fn add(self, other: Color) -> Self::Output {
+        return Color {
+            r: f64::min(self.r + other.r, 1.0),
+            g: f64::min(self.g + other.g, 1.0),
+            b: f64::min(self.b + other.b, 1.0) };
+    }
+}
+
+impl ops::AddAssign for Color {
+    fn add_assign(&mut self, rhs: Self) {
+        self.r = f64::min(self.r + rhs.r, 1.0);
+        self.g += f64::min(self.g + rhs.g, 1.0);
+        self.b += f64::min(self.b + rhs.b, 1.0);
+    }
+}
+
 impl ops::Mul for Color {
     type Output = Color;
 
@@ -18,11 +37,35 @@ impl ops::Mul for Color {
     }
 }
 
+impl ops::Mul<f64> for Color {
+    type Output = Color;
+
+    fn mul(self, other: f64) -> Self::Output {
+        return Color { r: self.r * other,g: self.g * other,b: self.b * other };
+    }
+}
+
+impl ops::Mul<Color> for f64 {
+    type Output = Color;
+
+    fn mul(self, other: Color) -> Self::Output {
+        return Color { r: self * other.r,g: self * other.g ,b: self * other.b };
+    }
+}
+
 impl ops::MulAssign for Color {
     fn mul_assign(&mut self, rhs: Self) {
         self.r *= rhs.r;
         self.g *= rhs.g;
         self.b *= rhs.b;
+    }
+}
+
+impl ops::MulAssign<f64> for Color {
+    fn mul_assign(&mut self, rhs: f64) {
+        self.r *= rhs;
+        self.g *= rhs;
+        self.b *= rhs;
     }
 }
 
@@ -41,3 +84,30 @@ pub trait Intersectable {
     fn intersect(&self, r: &Ray) -> (bool, Vector, Vector);
 }
 
+pub trait Lightsource {
+    fn get_light(&self, p: Vector) -> (Vector, f64, Color);
+}
+
+pub struct DirectionalLight {
+    pub c: Color,
+    pub d: Vector
+}
+
+pub struct PointLight {
+    pub c: Color,
+    pub o: Vector,
+    pub d: f64,
+}
+
+impl Lightsource for DirectionalLight {
+    fn get_light(&self, _p: Vector) -> (Vector, f64, Color) {
+        return (self.d, 1.0, self.c);
+    }
+}
+
+impl Lightsource for PointLight {
+    fn get_light(&self, p: Vector) -> (Vector, f64, Color) {
+        let v = p - self.o;
+        return (v.unit(), f64::clamp(1.0 - v.norm() / self.d, 0.0, 1.0), self.c);
+    }
+}
