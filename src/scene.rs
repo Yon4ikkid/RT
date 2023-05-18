@@ -87,16 +87,46 @@ impl Camera {
 }
 
 impl Scene { 
-    pub fn render(&self, mut trace_limit: u64) {
-        let mut image: RgbImage = RgbImage::new(self.camera.width as u32, self.camera.height as u32);
-        let (mut r, mut g, mut b): (u8, u8, u8);
-        let mut out_color: Color;
-        let mut ray: Ray;
+    fn trace_ray(&self, ray: Ray, trace_limit: u64) -> Color {
         let (mut d, mut p, mut n): (bool, Vector, Vector);
         let mut min_distance: f64;
         let mut cur_distance: f64;
         let mut ray_segment: Vector;
         let mut incid: std::option::Option<&Object>;
+        let mut out_color: Color = Color { r: 1.0, g: 1.0, b: 1.0};
+
+        min_distance = 0.0;
+        incid = None;
+        for object in &self.objects {
+            (d, p, n) = object.s.intersect(&ray);
+            if d == true {
+                ray_segment = p - self.camera.origin;
+                cur_distance = ray_segment * ray_segment;
+                if min_distance == 0.0 || cur_distance < min_distance {
+                    min_distance = cur_distance;
+                    incid = Some(object);
+                }
+            }
+        }
+
+        if incid.is_some() {
+            out_color *= incid.unwrap().m.base_color;
+            // Reflect and refract
+
+        } else {
+            out_color *= self.ambient_light_color;
+        }
+
+        // Calculate lightsource contribution
+        
+        return out_color;
+    }
+
+    pub fn render(&self, mut trace_limit: u64) {
+        let mut image: RgbImage = RgbImage::new(self.camera.width as u32, self.camera.height as u32);
+        let (mut r, mut g, mut b): (u8, u8, u8);
+        let mut out_color: Color;
+        let mut ray: Ray;
 
         if trace_limit == 0 {
             trace_limit = 1;
@@ -104,35 +134,8 @@ impl Scene {
 
         for row in 0..self.camera.height {
             for col in 0..self.camera.width {
-                out_color = Color {r: 1.0, g: 1.0, b: 1.0};
                 ray = self.camera.get_ray(row as f64, col as f64);
-                
-                for _ in 0..trace_limit {
-                    min_distance = 0.0;
-                    incid = None;
-                    for object in &self.objects {
-                        (d, p, n) = object.s.intersect(&ray);
-                        if d == true {
-                            ray_segment = p - self.camera.origin;
-                            cur_distance = ray_segment * ray_segment;
-                            if min_distance == 0.0 || cur_distance < min_distance {
-                                min_distance = cur_distance;
-                                incid = Some(object);
-                            }
-                        }
-                    }
-                    
-                    if incid.is_some() {
-                        out_color.r *= incid.unwrap().m.base_color.r;
-                        out_color.g *= incid.unwrap().m.base_color.g;
-                        out_color.b *= incid.unwrap().m.base_color.b;
-                    } else {
-                        out_color.r *= self.ambient_light_color.r;
-                        out_color.g *= self.ambient_light_color.g;
-                        out_color.b *= self.ambient_light_color.b;
-                        break;
-                    }
-                }
+                out_color = self.trace_ray(ray, trace_limit);
 
                 r = (out_color.r * 255.0) as u8;
                 g = (out_color.g * 255.0) as u8;

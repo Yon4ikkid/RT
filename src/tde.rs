@@ -17,12 +17,16 @@ impl Ray {
         return self.o + self.d * t;
     }
 
-    pub fn refract(&self,  n: Vector, source_index: f64, target_index: f64) -> Ray {
-
+    pub fn refracted_direction(&self,  n: Vector, source_index: f64, target_index: f64) -> Vector {
+        let mu: f64 = source_index / target_index;
+        let reversed_d_n: Vector = (self.d * n) * n;
+        let refracted_superficial: Vector = (self.d - reversed_d_n) / mu;
+        let refracted_normal: Vector = reversed_d_n * (1.0 - refracted_superficial * refracted_superficial).sqrt();
+        return refracted_superficial + refracted_normal;
     }
 
-    pub fn reflect(&self, n: Vector, source_index: f64, target_index: f64) -> Ray {
-
+    pub fn reflected_direction(&self, n: Vector) -> Vector {
+        return (((-self.d) * n) * n + self.d) * 2.0 - self.d;
     }
 }
 
