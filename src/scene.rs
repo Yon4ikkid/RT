@@ -98,7 +98,7 @@ impl Scene {
         let mut incid: std::option::Option<&Object>;
         let mut out_color: Color = Color::zero();
 
-        const DIFF_DIV: i64 = 5;
+        const DIFF_DIV: i64 = 4;
         const DIFF_DELTA: f64 = PI / (DIFF_DIV as f64);
 
         p = ray.o;
@@ -153,7 +153,7 @@ impl Scene {
                     let surf_r: f64 = incid.unwrap().m.roughness;
 
                     let l = |s: f64| -> f64 {
-                        -f64::exp(-0.5 * ((s-PI*0.5-incidence_angle)/(surf_r + 0.05)).powf(2.0)) * f64::cos((s - PI*0.5 - incidence_angle) * 0.5 - PI) * 0.5
+                        f64::exp(-0.5 * ((s-PI*0.5-incidence_angle)/(surf_r + 0.05)).powf(2.0)) * f64::cos((s - PI*0.5 - incidence_angle) * 0.5 - PI) / DIFF_DIV as f64
                     };
 
                     let mut angle_1: f64 = DIFF_DELTA;
@@ -165,8 +165,8 @@ impl Scene {
                             let current_coef: f64 = (l(angle_1)*l(angle_2)).sqrt();
                             coef_sum += current_coef;
 
-                            if current_coef > 0.001 {
-                                diff_ray.d = (s1 * angle_1.cos() + s2 * angle_2.cos() + n * angle_1.sin() * angle_2.sin()).unit();
+                            if current_coef > 0.01 {
+                                diff_ray.d = (s1 * angle_1.sin() + s2 * angle_2.sin() + n * angle_1.cos() * angle_2.cos()).unit();
                                 reflected_contribution += current_coef * self.trace_ray(&diff_ray, trace_limit - 1);
                             }
 
@@ -189,6 +189,8 @@ impl Scene {
             
             if (light_dir * ray.d).is_sign_negative() {
                 out_color = light_color * f64::max(-light_dir * ray.d, 0.0) * light_intensity;
+            } else {
+                out_color = Color::zero();
             }
             out_color += self.ambient_light_color;
         }
