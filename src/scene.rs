@@ -5,6 +5,7 @@ use crate::rendering::Color;
 use crate::rendering::Lightsource;
 use crate::rendering::Object;
 use crate::tde::Ray;
+use std::f64::consts::PI;
 use std::vec::Vec;
 use image::{RgbImage, Rgb};
 
@@ -89,13 +90,16 @@ impl Camera {
 }
 
 impl Scene { 
-    fn trace_ray(&self, ray: Ray, trace_limit: u64) -> Color {
-        let (mut d, mut p, mut n): (bool, Vector, Vector) = (false, Vector::default(), Vector::default());
+    fn trace_ray(&self, ray: &Ray, trace_limit: u64) -> Color {
+        let (mut p, mut n): (Vector, Vector);// = (false, Vector::default(), Vector::default());
         let mut min_distance: f64;
         let mut cur_distance: f64;
         let mut ray_segment: Vector;
         let mut incid: std::option::Option<&Object>;
         let mut out_color: Color = Color::zero();
+
+        const DIFF_DIV: i64 = 5;
+        const DIFF_DELTA: f64 = PI / (DIFF_DIV as f64);
 
         p = ray.o;
         n = ray.d;
@@ -120,7 +124,7 @@ impl Scene {
         }
 
         if incid.is_some() {
-            out_color = incid.unwrap().m.base_color;
+            // out_color = incid.unwrap().m.base_color;
             if trace_limit > 1 {
                 let (source_index, mut target_index): (f64, f64) = (ray.i, incid.unwrap().m.refractive_index);
                 if source_index == target_index {
@@ -134,20 +138,51 @@ impl Scene {
 
                 let reflected: f64 = incid.unwrap().m.opacity;
                 let transmitted: f64 = 1.0 - reflected;
-                let mut reflected_contribution: Color = Color::default();
-                let mut transmitted_contribution: Color = Color::default();
+                let mut reflected_contribution: Color = Color::zero();
+                let mut transmitted_contribution: Color = Color::zero();
 
                 if transmitted != 0.0 {
                     let refracted_ray: Ray = Ray::new(p, ray.refracted_direction(n, source_index, target_index), Color { r: 1.0, g: 1.0, b: 1.0 }, target_index);
-                    transmitted_contribution = self.trace_ray(refracted_ray, trace_limit - 1);
+                    transmitted_contribution = self.trace_ray(&refracted_ray, trace_limit - 1);
                 }
 
                 if reflected != 0.0 {
-                    let reflected_ray: Ray = Ray::new(p, ray.reflected_direction(n), Color {r: 1.0, g: 1.0, b: 1.0}, ray.i);
-                    reflected_contribution = self.trace_ray(reflected_ray, trace_limit - 1);
+                    let s1: Vector = (ray.d - n * (n * ray.d)).unit();
+                    let s2: Vector = s1.cross(n).unit();
+                    let incidence_angle: f64 = (n * (-ray.d)).acos();
+                    let surf_r: f64 = incid.unwrap().m.roughness;
+
+                    let l = |s: f64| -> f64 {
+                        -f64::exp(-0.5 * ((s-PI*0.5-incidence_angle)/(surf_r + 0.05)).powf(2.0)) * f64::cos((s - PI*0.5 - incidence_angle) * 0.5 - PI) * 0.5
+                    };
+
+                    let mut angle_1: f64 = DIFF_DELTA;
+                    let mut coef_sum: f64 = 0.0;
+                    let mut diff_ray: Ray = Ray::new(p, Vector::default(), Color::default(), ray.i);
+                    for _ in 1..DIFF_DIV {
+                        let mut angle_2: f64 = DIFF_DELTA;
+                        for _ in 1..DIFF_DIV {
+                            let current_coef: f64 = (l(angle_1)*l(angle_2)).sqrt();
+                            coef_sum += current_coef;
+
+                            if current_coef > 0.001 {
+                                diff_ray.d = (s1 * angle_1.cos() + s2 * angle_2.cos() + n * angle_1.sin() * angle_2.sin()).unit();
+                                reflected_contribution += current_coef * self.trace_ray(&diff_ray, trace_limit - 1);
+                            }
+
+                            angle_2 += DIFF_DELTA;
+                        }
+                        angle_1 += DIFF_DELTA;
+                    }
+
+                    // let reflected_ray: Ray = Ray::new(p, ray.reflected_direction(n), Color {r: 1.0, g: 1.0, b: 1.0}, ray.i);
+                    // reflected_contribution *= self.trace_ray(&reflected_ray, trace_limit - 1);
+                    reflected_contribution *= 1.0/coef_sum;
                 }
 
-                out_color *=  incid.unwrap().m.base_color * reflected * reflected_contribution + transmitted * transmitted_contribution;
+                out_color =  incid.unwrap().m.base_color * reflected * reflected_contribution + transmitted * transmitted_contribution;
+            } else {
+                out_color *= 0.0;
             }
         } else {
             let (light_dir, light_intensity, light_color) = self.lightsource.get_light(p);
@@ -161,7 +196,7 @@ impl Scene {
         return out_color;
     }
 
-    pub fn render(&self, mut trace_limit: u64) {
+    pub fn render(&self, trace_limit: u64) {
         let mut image: RgbImage = RgbImage::new(self.camera.width as u32, self.camera.height as u32);
         let (mut r, mut g, mut b): (u8, u8, u8);
         let mut out_color: Color;
@@ -170,7 +205,7 @@ impl Scene {
         for row in 0..self.camera.height {
             for col in 0..self.camera.width {
                 ray = self.camera.get_ray(row as f64, col as f64);
-                out_color = self.trace_ray(ray, trace_limit);
+                out_color = self.trace_ray(&ray, trace_limit);
 
                 r = u8::min((out_color.r * 255.0) as u8, 255);
                 g = u8::min((out_color.g * 255.0) as u8, 255);

@@ -28,6 +28,14 @@ impl Vector {
     pub fn norm(self) -> f64 {
         return f64::sqrt(self * self);
     }
+
+    pub fn cross(self, other: Vector) -> Vector {
+        return Vector {
+            x: self.y * other.z - self.z * other.y,
+            y: self.z * other.x - self.x * other.z,
+            z: self.x * other.y - self.y * other.x
+        }
+    }
 }
 
 impl ops::Add for Vector {

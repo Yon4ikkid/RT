@@ -11,17 +11,17 @@ pub mod scene;
 
 fn main() {
     std::env::set_var("RUST_BACKTRACE", "1");
-    const AMB: f64 = 0.2;
+    const AMB: f64 = 0.002;
     let c: scene::Camera = scene::Camera::new(600, 600, 1000.0, math::Vector {x: 0.0, y: -600.0, z: 0.0}, 0.0, 0.0, 0.0);
     let mut s: scene::Scene = scene::Scene { ambient_light_color: rendering::Color { r: AMB, g:AMB, b: AMB }, camera: c, objects: std::vec::Vec::new(),
-                                            //  lightsource: Box::new(PointLight {c: Color { r: 1.0, g: 1.0, b: 1.0 } , o: Vector { x: 0.0, y: 50.0, z: 70.0 }, d: 15000.0 }) };
-                                            lightsource: Box::new(DirectionalLight {c: Color { r: 1.0, g: 1.0, b: 1.0 } , d: Vector { x: -2.0, y: 1.0, z: -1.7 }.unit()}) };
+                                             lightsource: Box::new(PointLight {c: Color { r: 1.0, g: 1.0, b: 1.0 } , o: Vector { x: 0.0, y: 50.0, z: 70.0 }, d: 15000.0 }) };
+                                            // lightsource: Box::new(DirectionalLight {c: Color { r: 1.0, g: 1.0, b: 1.0 } , d: Vector { x: -2.0, y: 1.0, z: -1.7 }.unit()}) };
     let o: Object = Object { m: Material { base_color: Color {r: 0.8, g: 0.3, b: 0.3}, 
-        refractive_index: 1.0, opacity: 0.5, roughness: 0.1}, s: Box::new(Sphere { c: Vector { x: -50.0, y: 90.0, z: 0.0 }, r: 80.0 }) };
+        refractive_index: 1.0, opacity: 0.2, roughness: 0.1}, s: Box::new(Sphere { c: Vector { x: -50.0, y: 90.0, z: 0.0 }, r: 80.0 }) };
     let o1: Object = Object { m: Material { base_color: Color {r: 0.1, g: 0.1, b: 0.9}, 
         refractive_index: 1.5, opacity: 1.0, roughness: 0.5}, s: Box::new(Sphere { c: Vector { x: 20.0, y: 250.0, z: -14.0 }, r: 60.0 }) };
-    let o2: Object = Object { m: Material { base_color: Color {r: 0.05, g: 1.0, b: 0.05}, 
-        refractive_index: 1.0, opacity: 1.0, roughness: 0.9}, s: Box::new(Plane { a: Vector { x: 20.0, y: 250.0, z: -300.0 }, n: Vector { x: 0.1, y: 0.01, z: 1.0 }.unit() }) };
+    let o2: Object = Object { m: Material { base_color: Color {r: 0.05, g: 0.4, b: 0.05}, 
+        refractive_index: 1.0, opacity: 1.0, roughness: 1.0}, s: Box::new(Plane { a: Vector { x: 20.0, y: 250.0, z: -300.0 }, n: Vector { x: 0.1, y: 0.01, z: 1.0 }.unit() }) };
     let o3: Object = Object { m: Material { base_color: Color {r: 0.3, g: 0.5, b: 0.5}, 
     refractive_index: 1.0, opacity: 1.0, roughness: 0.9}, s: Box::new(Plane { a: Vector { x: 20.0, y: 600.0, z: -300.0 }, n: Vector { x: 0.5, y: -1.01, z: 0.05 }.unit() }) };
     s.objects.push(o);
