@@ -10,6 +10,20 @@ pub struct Color {
     pub b: f64,
 }
 
+impl Color {
+    pub fn new(r: f64, g: f64, b: f64) -> Color {
+        return Color { r, g, b };
+    }
+
+    pub fn default() -> Color {
+        return Color { r: 1.0, g: 1.0, b: 1.0 };
+    }
+
+    pub fn zero() -> Color {
+        return Color { r: 0.0, g: 0.0, b: 0.0 };
+    }
+}
+
 impl ops::Add for Color {
     type Output = Color;
 
@@ -72,7 +86,8 @@ impl ops::MulAssign<f64> for Color {
 pub struct Material {
     pub base_color: Color,
     pub refractive_index: f64,
-    pub reflection_ratio: f64,
+    pub opacity: f64,
+    pub roughness: f64,
 }
 
 pub struct Object {

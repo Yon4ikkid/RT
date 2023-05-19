@@ -95,7 +95,7 @@ impl Scene {
         let mut cur_distance: f64;
         let mut ray_segment: Vector;
         let mut incid: std::option::Option<&Object>;
-        let mut out_color: Color = Color { r: 1.0, g: 1.0, b: 1.0};
+        let mut out_color: Color = Color::zero();
 
         p = ray.o;
         n = ray.d;
@@ -119,26 +119,6 @@ impl Scene {
             n = -n;
         }
 
-        let (light_dir, light_intensity, mut light_color) = self.lightsource.get_light(p);
-        light_color *= light_intensity;
-
-        // Calculate lightsource contribution
-        // let superficial: Vector = -(ray.d + ((-ray.d) * n) * n).unit();
-
-        // let light_superficial: f64 =  -(light_dir * superficial);
-        // let light_normal: f64 = -(light_dir * n);
-        // let ray_superficial: f64 = -(ray.d * superficial);
-        // let ray_normal: f64 = -(ray.d * n);
-
-        // if light_normal.is_sign_positive() && light_superficial.is_sign_negative() {
-        //     let superficial_intake: f64 = f64::min(ray_superficial, light_superficial);
-        //     let normal_intake: f64 = f64::min(ray_normal, light_normal);
-
-        //     light_color *= 1.0 - (normal_intake-ray_normal).abs() * (superficial_intake-ray_superficial).abs();
-        // } else {
-        //     light_color *= 0.0;
-        // }
-
         if incid.is_some() {
             out_color = incid.unwrap().m.base_color;
             if trace_limit > 1 {
@@ -146,40 +126,37 @@ impl Scene {
                 if source_index == target_index {
                     target_index = 1.0;
                 }
-                // Reflect and refract
-                let r0: f64 = ((source_index - target_index) / (source_index + target_index)).powf(2.0);
-                let mut reflected_thet: f64 = r0 + (1.0 - r0) * (1.0 - (-ray.d) * n).powf(5.0);
-                // reflected_thet = incid.unwrap().m.reflection_ratio;
-                let refracted_thet: f64 = 1.0 - reflected_thet;
-
                 
-                let reflected_ray: Ray = Ray::new(p, ray.reflected_direction(n), Color {r: 1.0, g: 1.0, b: 1.0}, ray.i);
-                let refracted_ray: Ray = Ray::new(p, ray.refracted_direction(n, source_index, target_index), Color { r: 1.0, g: 1.0, b: 1.0 }, target_index);
-                light_color += reflected_thet * self.trace_ray(reflected_ray, trace_limit - 1) + refracted_thet * self.trace_ray(refracted_ray, trace_limit - 1);
+                // Schlick's Approximation
+                // let r0: f64 = ((source_index - target_index) / (source_index + target_index)).powf(2.0);
+                // let reflected_thet: f64 = r0 + (1.0 - r0) * (1.0 - (-ray.d) * n).powf(5.0);
+                // let refracted_thet: f64 = 1.0 - reflected_thet;
+
+                let reflected: f64 = incid.unwrap().m.opacity;
+                let transmitted: f64 = 1.0 - reflected;
+                let mut reflected_contribution: Color = Color::default();
+                let mut transmitted_contribution: Color = Color::default();
+
+                if transmitted != 0.0 {
+                    let refracted_ray: Ray = Ray::new(p, ray.refracted_direction(n, source_index, target_index), Color { r: 1.0, g: 1.0, b: 1.0 }, target_index);
+                    transmitted_contribution = self.trace_ray(refracted_ray, trace_limit - 1);
+                }
+
+                if reflected != 0.0 {
+                    let reflected_ray: Ray = Ray::new(p, ray.reflected_direction(n), Color {r: 1.0, g: 1.0, b: 1.0}, ray.i);
+                    reflected_contribution = self.trace_ray(reflected_ray, trace_limit - 1);
+                }
+
+                out_color *=  incid.unwrap().m.base_color * reflected * reflected_contribution + transmitted * transmitted_contribution;
             }
         } else {
-            // let superficial: Vector = -(ray.d + ((-ray.d) * n) * n).unit();
-
-            // let light_superficial: f64 =  -(light_dir * superficial);
-            // let light_normal: f64 = -(light_dir * n);
-            // let ray_superficial: f64 = -(ray.d * superficial);
-            // let ray_normal: f64 = -(ray.d * n);
-
-            // if light_normal.is_sign_positive() && light_superficial.is_sign_negative() {
-            //     let superficial_intake: f64 = f64::min(ray_superficial, light_superficial);
-            //     let normal_intake: f64 = f64::min(ray_normal, light_normal);
-
-            //     light_color *= 1.0 - (normal_intake-ray_normal).abs() * (superficial_intake-ray_superficial).abs();
-            // } else {
-            //     light_color *= 0.0;
-            // }
+            let (light_dir, light_intensity, light_color) = self.lightsource.get_light(p);
+            
             if (light_dir * ray.d).is_sign_negative() {
-                light_color *= 1.0 - f64::max(-light_dir * ray.d, 0.0);
+                out_color = light_color * f64::max(-light_dir * ray.d, 0.0) * light_intensity;
             }
+            out_color += self.ambient_light_color;
         }
-
-        light_color += self.ambient_light_color;
-        out_color *= light_color;
 
         return out_color;
     }
