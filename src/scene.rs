@@ -96,10 +96,8 @@ impl Scene {
         let mut cur_distance: f64;
         let mut ray_segment: Vector;
         let mut incid: std::option::Option<&Object>;
+        let obj: &Object;
         let mut out_color: Color = Color::zero();
-
-        const DIFF_DIV: i64 = 4;
-        const DIFF_DELTA: f64 = 2.0 / (DIFF_DIV as f64);
 
         p = ray.o;
         n = ray.d;
@@ -123,9 +121,12 @@ impl Scene {
             n = -n;
         }
 
+        const DIFF_DIV: i64 = 1;
+
         if incid.is_some() {
+            obj = incid.unwrap();
             if trace_limit > 1 {
-                let (source_index, mut target_index): (f64, f64) = (ray.i, incid.unwrap().m.refractive_index);
+                let (source_index, mut target_index): (f64, f64) = (ray.i, obj.m.refractive_index);
                 if source_index == target_index {
                     target_index = 1.0;
                 }
@@ -135,7 +136,7 @@ impl Scene {
                 // let reflected: f64 = r0 + (1.0 - r0) * (1.0 - (-ray.d) * n).powf(5.0);
                 // let transmitted: f64 = 1.0 - reflected;
 
-                let reflected: f64 = incid.unwrap().m.opacity;
+                let reflected: f64 = obj.m.opacity;
                 let transmitted: f64 = 1.0 - reflected;
                 let mut reflected_contribution: Color = Color::zero();
                 let mut transmitted_contribution: Color = Color::zero();
@@ -146,46 +147,43 @@ impl Scene {
                 }
 
                 if reflected != 0.0 {
-                    let s1: Vector = (ray.d - n * (n * ray.d)).unit();
-                    let s2: Vector = s1.cross(n).unit();
-                    let incidence_angle: f64 = (n * (-ray.d)).acos();
-                    let surf_r: f64 = incid.unwrap().m.roughness;
-                    const t: f64 = 0.5;
+                    // let rz: Vector = ray.reflected_direction(n);
+                    // let rx: Vector = ray.d.cross(n).unit();
+                    // let ry: Vector = rx.cross(rz).unit();
+                    // let deviation: f64 = if obj.m.roughness == 0.0 { 0.01 } else { obj.m.roughness };
+                    // let deviation_step: f64 = deviation / (DIFF_DIV as f64);
 
-                    let ls = |t1:f64, t2:f64| -> f64 {
-                        (1.0 / ((surf_r + t)*f64::sqrt(2.0*PI))) * f64::exp( -(0.5 / (surf_r + t).powf(2.0)) * ((t1 - 2.0 * incidence_angle / PI).powf(2.0) + t2.powf(2.0)))
-                    };
+                    // // println!("Deviation: {}, Step: {}", deviation, deviation_step);
 
-                    let mut angle_1: f64 = DIFF_DELTA;
-                    let mut coef_sum: f64 = 0.0;
-                    let mut diff_ray: Ray = Ray::new(p, Vector::default(), Color::default(), ray.i);
-                    for _ in 1..DIFF_DIV {
-                        let mut angle_2: f64 = DIFF_DELTA;
-                        for _ in 1..DIFF_DIV {
-                            let current_coef: f64 = ls(angle_1, angle_2);
-                            
-                            if current_coef > 0.05 {
-                                coef_sum += current_coef;
+                    // let ls = |x: f64, y: f64| -> f64 {
+                    //     f64::exp(-0.5 / (0.5 as f64).powf(2.0) * (x.powf(2.0) + y.powf(2.0)))
+                    // };
 
-                                let lx: f64 = angle_1 - 1.0;
-                                let ly: f64 = angle_2 - 1.0;
-                                let lz: f64 = (1.0 - lx.powf(2.0) - ly.powf(2.0)).sqrt();
-                                diff_ray.d = (s1 * lx +  s2 * ly + n * lz).unit();
-                                reflected_contribution += current_coef * self.trace_ray(&diff_ray, trace_limit - 1) * lz;
-                            }
+                    // let mut diffusive_contribution: Color = Color::zero();
+                    // let mut coeff_sum: f64 = 0.0;
+                    // for xs in -DIFF_DIV..(DIFF_DIV + 1) {
+                    //     for ys in -DIFF_DIV..(DIFF_DIV + 1) {
+                    //         let (dx, dy): (f64, f64) = (deviation_step * xs as f64, deviation_step * ys as f64);
+                    //         // println!("dx: {}, dy: {}", dx, dy);
+                    //         let coeff: f64 = ls(dx, dy);
+                    //         // if coeff > 0.2 {
+                    //         let dray_d: Vector = rx * dx + ry * dy + rz * (1.0 - dx.powf(2.0) - dy.powf(2.0)).sqrt();
+                    //         let dray: Ray = Ray::new(p, dray_d, Color::default(), ray.i);
+                    //         diffusive_contribution += self.trace_ray(&dray, trace_limit - 1);
+                    //         coeff_sum += coeff;
+                    //         // }
+                    //         // println!("Coefficient: {}", coeff);
+                    //     }
+                    // }
 
-                            angle_2 += DIFF_DELTA;
-                        }
-                        angle_1 += DIFF_DELTA;
-                    }
-
-                    // let reflected_ray: Ray = Ray::new(p, ray.reflected_direction(n), Color {r: 1.0, g: 1.0, b: 1.0}, ray.i);
-                    // reflected_contribution = -ray.d * n * self.trace_ray(&reflected_ray, trace_limit - 1);
-                    reflected_contribution *= 1.0 / coef_sum;
-                    // reflected_contribution = surf_r * reflected_contribution * (1.0/coef_sum) + (1.0 - surf_r) * self.trace_ray(&reflected_ray, trace_limit - 1);
+                    // // reflected_contribution *=  1.0 / (DIFF_DIV * 2 + 1).pow(2) as f64;
+                    // let dray: Ray = Ray::new(p, rz, Color::default(), ray.i);
+                    // reflected_contribution = (1.0 - deviation) * self.trace_ray(&dray, trace_limit - 1) + deviation * diffusive_contribution * (1.0 / ((DIFF_DIV as f64) * 2.0 - 1.0 ));
+                    let dray: Ray = Ray::new(p, ray.reflected_direction(n), Color::default(), ray.i);
+                    reflected_contribution = -ray.d * n * self.trace_ray(&dray, trace_limit - 1);
                 }
 
-                out_color =  incid.unwrap().m.base_color * (reflected * reflected_contribution + transmitted * transmitted_contribution);
+                out_color =  obj.m.base_color * (reflected * reflected_contribution + transmitted * transmitted_contribution);
             } else {
                 out_color *= 0.0;
             }
