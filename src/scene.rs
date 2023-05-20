@@ -99,7 +99,7 @@ impl Scene {
         let mut out_color: Color = Color::zero();
 
         const DIFF_DIV: i64 = 4;
-        const DIFF_DELTA: f64 = PI / (DIFF_DIV as f64);
+        const DIFF_DELTA: f64 = 2.0 / (DIFF_DIV as f64);
 
         p = ray.o;
         n = ray.d;
@@ -124,7 +124,6 @@ impl Scene {
         }
 
         if incid.is_some() {
-            // out_color = incid.unwrap().m.base_color;
             if trace_limit > 1 {
                 let (source_index, mut target_index): (f64, f64) = (ray.i, incid.unwrap().m.refractive_index);
                 if source_index == target_index {
@@ -133,8 +132,8 @@ impl Scene {
                 
                 // Schlick's Approximation
                 // let r0: f64 = ((source_index - target_index) / (source_index + target_index)).powf(2.0);
-                // let reflected_thet: f64 = r0 + (1.0 - r0) * (1.0 - (-ray.d) * n).powf(5.0);
-                // let refracted_thet: f64 = 1.0 - reflected_thet;
+                // let reflected: f64 = r0 + (1.0 - r0) * (1.0 - (-ray.d) * n).powf(5.0);
+                // let transmitted: f64 = 1.0 - reflected;
 
                 let reflected: f64 = incid.unwrap().m.opacity;
                 let transmitted: f64 = 1.0 - reflected;
@@ -151,9 +150,10 @@ impl Scene {
                     let s2: Vector = s1.cross(n).unit();
                     let incidence_angle: f64 = (n * (-ray.d)).acos();
                     let surf_r: f64 = incid.unwrap().m.roughness;
+                    const t: f64 = 0.5;
 
-                    let l = |s: f64| -> f64 {
-                        f64::exp(-0.5 * ((s-PI*0.5-incidence_angle)/(surf_r + 0.05)).powf(2.0)) * f64::cos((s - PI*0.5 - incidence_angle) * 0.5 - PI) / DIFF_DIV as f64
+                    let ls = |t1:f64, t2:f64| -> f64 {
+                        (1.0 / ((surf_r + t)*f64::sqrt(2.0*PI))) * f64::exp( -(0.5 / (surf_r + t).powf(2.0)) * ((t1 - 2.0 * incidence_angle / PI).powf(2.0) + t2.powf(2.0)))
                     };
 
                     let mut angle_1: f64 = DIFF_DELTA;
@@ -162,12 +162,16 @@ impl Scene {
                     for _ in 1..DIFF_DIV {
                         let mut angle_2: f64 = DIFF_DELTA;
                         for _ in 1..DIFF_DIV {
-                            let current_coef: f64 = (l(angle_1)*l(angle_2)).sqrt();
-                            coef_sum += current_coef;
+                            let current_coef: f64 = ls(angle_1, angle_2);
+                            
+                            if current_coef > 0.05 {
+                                coef_sum += current_coef;
 
-                            if current_coef > 0.01 {
-                                diff_ray.d = (s1 * angle_1.sin() + s2 * angle_2.sin() + n * angle_1.cos() * angle_2.cos()).unit();
-                                reflected_contribution += current_coef * self.trace_ray(&diff_ray, trace_limit - 1);
+                                let lx: f64 = angle_1 - 1.0;
+                                let ly: f64 = angle_2 - 1.0;
+                                let lz: f64 = (1.0 - lx.powf(2.0) - ly.powf(2.0)).sqrt();
+                                diff_ray.d = (s1 * lx +  s2 * ly + n * lz).unit();
+                                reflected_contribution += current_coef * self.trace_ray(&diff_ray, trace_limit - 1) * lz;
                             }
 
                             angle_2 += DIFF_DELTA;
@@ -176,11 +180,12 @@ impl Scene {
                     }
 
                     // let reflected_ray: Ray = Ray::new(p, ray.reflected_direction(n), Color {r: 1.0, g: 1.0, b: 1.0}, ray.i);
-                    // reflected_contribution *= self.trace_ray(&reflected_ray, trace_limit - 1);
-                    reflected_contribution *= 1.0/coef_sum;
+                    // reflected_contribution = -ray.d * n * self.trace_ray(&reflected_ray, trace_limit - 1);
+                    reflected_contribution *= 1.0 / coef_sum;
+                    // reflected_contribution = surf_r * reflected_contribution * (1.0/coef_sum) + (1.0 - surf_r) * self.trace_ray(&reflected_ray, trace_limit - 1);
                 }
 
-                out_color =  incid.unwrap().m.base_color * reflected * reflected_contribution + transmitted * transmitted_contribution;
+                out_color =  incid.unwrap().m.base_color * (reflected * reflected_contribution + transmitted * transmitted_contribution);
             } else {
                 out_color *= 0.0;
             }
