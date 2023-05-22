@@ -32,16 +32,16 @@ impl ops::Add for Color {
     type Output = Color;
 
     fn add(self, other: Color) -> Self::Output {
-        // return Color {
-        //     r: f64::min(self.r + other.r, 1.0),
-        //     g: f64::min(self.g + other.g, 1.0),
-        //     b: f64::min(self.b + other.b, 1.0)
-        // };
         return Color {
-            r: self.r + other.r,
-            g: self.g + other.g,
-            b: self.b + other.b
+            r: f64::min(self.r + other.r, 1.0),
+            g: f64::min(self.g + other.g, 1.0),
+            b: f64::min(self.b + other.b, 1.0)
         };
+        // return Color {
+        //     r: self.r + other.r,
+        //     g: self.g + other.g,
+        //     b: self.b + other.b
+        // };
     }
 }
 

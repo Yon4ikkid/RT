@@ -145,43 +145,47 @@ impl Scene {
                 }
 
                 if reflected != 0.0 {
-                    const DIFF_DIV: i64 = 1;
+                    const DIFF_DIV: i64 = 4;
+                    const DIFF_DENSITY: f64 = 3.0;
                     let rz: Vector = ray.reflected_direction(n);
-                    let rx: Vector = rz.cross(n).unit();
-                    let ry: Vector = rx.cross(rz).unit();
+                    let rx: Vector = -rz.cross(n).unit();
+                    let ry: Vector = -rx.cross(rz).unit();
                     let in_angle: f64 = (-ray.d * n).acos();
                     let deviation: f64 = obj.m.roughness;
                     let deviation_step: f64 = 1.0 / (DIFF_DIV as f64);
 
                     let f = |x: f64| -> f64 {
-                        f64::exp(-(1.0-deviation) * (x*x))
+                        f64::exp(- (1.0 / (deviation * in_angle.cos() + 0.01)) * (10.0 * x).powf(2.0))
                         // 1.0
                     };
 
+                    let diff_div: i64 = (DIFF_DENSITY * deviation) as i64; 
                     let mut coef_sum: f64 = 0.0;
+                    let mut count = 0;
                     let mut scr: Ray = Ray::new(p, Vector::default(), Color::default(), ray.i);
-                    for h in -DIFF_DIV..(DIFF_DIV + 1) {
+                    for h in -diff_div..(diff_div + 1) {
                         let u: f64 = h as f64 * deviation_step;
                         let l1: f64 = f(u);
-                        for v in -DIFF_DIV..(DIFF_DIV + 1) {
+                        for v in -diff_div..(diff_div + 1) {
                             let s: f64 = v as f64 * deviation_step;
-                            
+                            let coef: f64 =  l1 * f(s);
 
-                            let c1: f64 = (-2.0 / PI * s * deviation).sin();
-                            let c2: f64 = (in_angle - 2.0 / PI * u * deviation).sin();
-                            let c3: f64 = (in_angle - 2.0 / PI * u * deviation).cos().max(0.0);
+                            let c1: f64 = (-0.5 * PI * s * deviation).sin();
+                            let c2: f64 = (in_angle - 0.25 * PI * u * deviation).sin();
+                            let c3: f64 = (in_angle - 0.25 * PI * u * deviation).cos();
 
                             scr.d = (c1 * rx + c2 * ry + c3 * rz).unit();
                             
                             let traced_color: Color = self.trace_ray(&scr, trace_limit - 1);
-                            let coef: f64 =  l1 * f(s);
-                            reflected_contribution += traced_color * coef;
+                            
+                            reflected_contribution += traced_color * coef * traced_color.magnitude();
                             coef_sum += coef;
+                            count += 1;
                         }
                     }
                     reflected_contribution *= 1.0 / coef_sum;
                     // let dray: Ray = Ray::new(p, ray.reflected_direction(n), Color::default(), ray.i);
-                    // reflected_contribution = -ray.d * n * self.trace_ray(&dray, trace_limit - 1);
+                    // reflected_contribution *= -ray.d * n;
                 }
 
                 out_color =  obj.m.base_color * (reflected * reflected_contribution + transmitted * transmitted_contribution);
