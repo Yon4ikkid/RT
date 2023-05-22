@@ -121,8 +121,6 @@ impl Scene {
             n = -n;
         }
 
-        const DIFF_DIV: i64 = 1;
-
         if incid.is_some() {
             obj = incid.unwrap();
             if trace_limit > 1 {
@@ -147,40 +145,43 @@ impl Scene {
                 }
 
                 if reflected != 0.0 {
-                    // let rz: Vector = ray.reflected_direction(n);
-                    // let rx: Vector = ray.d.cross(n).unit();
-                    // let ry: Vector = rx.cross(rz).unit();
-                    // let deviation: f64 = if obj.m.roughness == 0.0 { 0.01 } else { obj.m.roughness };
-                    // let deviation_step: f64 = deviation / (DIFF_DIV as f64);
+                    const DIFF_DIV: i64 = 1;
+                    let rz: Vector = ray.reflected_direction(n);
+                    let rx: Vector = rz.cross(n).unit();
+                    let ry: Vector = rx.cross(rz).unit();
+                    let in_angle: f64 = (-ray.d * n).acos();
+                    let deviation: f64 = obj.m.roughness;
+                    let deviation_step: f64 = 1.0 / (DIFF_DIV as f64);
 
-                    // // println!("Deviation: {}, Step: {}", deviation, deviation_step);
+                    let f = |x: f64| -> f64 {
+                        f64::exp(-(1.0-deviation) * (x*x))
+                        // 1.0
+                    };
 
-                    // let ls = |x: f64, y: f64| -> f64 {
-                    //     f64::exp(-0.5 / (0.5 as f64).powf(2.0) * (x.powf(2.0) + y.powf(2.0)))
-                    // };
+                    let mut coef_sum: f64 = 0.0;
+                    let mut scr: Ray = Ray::new(p, Vector::default(), Color::default(), ray.i);
+                    for h in -DIFF_DIV..(DIFF_DIV + 1) {
+                        let u: f64 = h as f64 * deviation_step;
+                        let l1: f64 = f(u);
+                        for v in -DIFF_DIV..(DIFF_DIV + 1) {
+                            let s: f64 = v as f64 * deviation_step;
+                            
 
-                    // let mut diffusive_contribution: Color = Color::zero();
-                    // let mut coeff_sum: f64 = 0.0;
-                    // for xs in -DIFF_DIV..(DIFF_DIV + 1) {
-                    //     for ys in -DIFF_DIV..(DIFF_DIV + 1) {
-                    //         let (dx, dy): (f64, f64) = (deviation_step * xs as f64, deviation_step * ys as f64);
-                    //         // println!("dx: {}, dy: {}", dx, dy);
-                    //         let coeff: f64 = ls(dx, dy);
-                    //         // if coeff > 0.2 {
-                    //         let dray_d: Vector = rx * dx + ry * dy + rz * (1.0 - dx.powf(2.0) - dy.powf(2.0)).sqrt();
-                    //         let dray: Ray = Ray::new(p, dray_d, Color::default(), ray.i);
-                    //         diffusive_contribution += self.trace_ray(&dray, trace_limit - 1);
-                    //         coeff_sum += coeff;
-                    //         // }
-                    //         // println!("Coefficient: {}", coeff);
-                    //     }
-                    // }
+                            let c1: f64 = (-2.0 / PI * s * deviation).sin();
+                            let c2: f64 = (in_angle - 2.0 / PI * u * deviation).sin();
+                            let c3: f64 = (in_angle - 2.0 / PI * u * deviation).cos().max(0.0);
 
-                    // // reflected_contribution *=  1.0 / (DIFF_DIV * 2 + 1).pow(2) as f64;
-                    // let dray: Ray = Ray::new(p, rz, Color::default(), ray.i);
-                    // reflected_contribution = (1.0 - deviation) * self.trace_ray(&dray, trace_limit - 1) + deviation * diffusive_contribution * (1.0 / ((DIFF_DIV as f64) * 2.0 - 1.0 ));
-                    let dray: Ray = Ray::new(p, ray.reflected_direction(n), Color::default(), ray.i);
-                    reflected_contribution = -ray.d * n * self.trace_ray(&dray, trace_limit - 1);
+                            scr.d = (c1 * rx + c2 * ry + c3 * rz).unit();
+                            
+                            let traced_color: Color = self.trace_ray(&scr, trace_limit - 1);
+                            let coef: f64 =  l1 * f(s);
+                            reflected_contribution += traced_color * coef;
+                            coef_sum += coef;
+                        }
+                    }
+                    reflected_contribution *= 1.0 / coef_sum;
+                    // let dray: Ray = Ray::new(p, ray.reflected_direction(n), Color::default(), ray.i);
+                    // reflected_contribution = -ray.d * n * self.trace_ray(&dray, trace_limit - 1);
                 }
 
                 out_color =  obj.m.base_color * (reflected * reflected_contribution + transmitted * transmitted_contribution);

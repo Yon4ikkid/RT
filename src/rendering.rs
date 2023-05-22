@@ -22,6 +22,10 @@ impl Color {
     pub fn zero() -> Color {
         return Color { r: 0.0, g: 0.0, b: 0.0 };
     }
+
+    pub fn magnitude(self) -> f64 {
+        return (self.r * self.r + self.b * self.b + self.g * self.g).sqrt();
+    }
 }
 
 impl ops::Add for Color {
