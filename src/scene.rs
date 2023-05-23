@@ -155,20 +155,19 @@ impl Scene {
                     let deviation_step: f64 = 1.0 / (DIFF_DIV as f64);
 
                     let f = |x: f64| -> f64 {
-                        f64::exp(- (1.0 / (deviation * in_angle.cos() + 0.01)) * (10.0 * x).powf(2.0))
+                        f64::exp(-(0.5 * (1.0 - deviation)) * (x).powf(2.0))
                         // 1.0
                     };
 
                     let diff_div: i64 = (DIFF_DENSITY * deviation) as i64; 
                     let mut coef_sum: f64 = 0.0;
-                    let mut count = 0;
                     let mut scr: Ray = Ray::new(p, Vector::default(), Color::default(), ray.i);
                     for h in -diff_div..(diff_div + 1) {
                         let u: f64 = h as f64 * deviation_step;
-                        let l1: f64 = f(u);
+                        // let l1: f64 = f(u);
                         for v in -diff_div..(diff_div + 1) {
                             let s: f64 = v as f64 * deviation_step;
-                            let coef: f64 =  l1 * f(s);
+                            // let coef: f64 =  l1 * f(s);
 
                             let c1: f64 = (-0.5 * PI * s * deviation).sin();
                             let c2: f64 = (in_angle - 0.25 * PI * u * deviation).sin();
@@ -177,18 +176,15 @@ impl Scene {
                             scr.d = (c1 * rx + c2 * ry + c3 * rz).unit();
                             
                             let traced_color: Color = self.trace_ray(&scr, trace_limit - 1);
-                            
-                            reflected_contribution += traced_color * coef * traced_color.magnitude();
+                            let coef: f64 = (scr.d * n) / (-ray.d * n);
+                            reflected_contribution += traced_color * coef;
                             coef_sum += coef;
-                            count += 1;
                         }
                     }
                     reflected_contribution *= 1.0 / coef_sum;
-                    // let dray: Ray = Ray::new(p, ray.reflected_direction(n), Color::default(), ray.i);
-                    // reflected_contribution *= -ray.d * n;
                 }
 
-                out_color =  obj.m.base_color * (reflected * reflected_contribution + transmitted * transmitted_contribution);
+                out_color = obj.m.base_color * (reflected * reflected_contribution + transmitted * transmitted_contribution);
             } else {
                 out_color *= 0.0;
             }
