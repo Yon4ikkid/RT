@@ -91,7 +91,47 @@ pub struct Circle {
 }
 
 pub struct BiconvexLens {
+    sp1: Sphere,
+    sp2: Sphere,
+    pub c: Vector,
+    pub r: f64,
+    pub a: f64,
+}
 
+impl BiconvexLens {
+    pub fn new(center: Vector, axis: Vector, curv_radius: f64, sub_ratio: f64) -> BiconvexLens {
+        return BiconvexLens { 
+            sp1: Sphere { c : center + axis * curv_radius * (1.0 - sub_ratio), r: curv_radius},
+            sp2: Sphere { c: center - axis * curv_radius * (1.0 - sub_ratio), r: curv_radius},
+            c: center,
+            r: curv_radius,
+            a: sub_ratio
+        };
+    }
+}
+
+impl Intersectable for BiconvexLens {
+    fn intersect(&self, r: &Ray) -> (bool, Vector, Vector) {
+        let (b1, p1, n1): (bool, Vector, Vector) = self.sp1.intersect(r);
+        let (b2, p2, n2) = self.sp2.intersect(r);
+
+        if !(b1 && b2) {
+            return (false, Vector::default(), Vector::default());
+        }
+
+        let check = |p: Vector| {
+            (p - self.c).norm() <= (self.r * self.r - self.r * (1.0 - self.a)).sqrt()
+        };
+
+        if check(p1) {
+            return (true, p1, n1);
+        }
+        if check(p2) {
+            return (true, p2, n2);
+        }
+
+        return (false, Vector::default(), Vector::default());
+    }
 }
 
 pub struct OpenCylinder {
