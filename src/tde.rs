@@ -183,5 +183,6 @@ impl Intersectable for Paraboloid {
             return (false, Vector::default(), Vector::default());            
         }
         return (true, p1, (self.n + (p1 - self.f).unit()).unit());
+        
     }
 }
