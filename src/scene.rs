@@ -145,7 +145,7 @@ impl Scene {
                 }
 
                 if reflected != 0.0 {
-                    const DIFF_DENSITY: f64 = 4.0;
+                    const DIFF_DENSITY: f64 = 10.0;
                     let rz: Vector = ray.reflected_direction(n);
                     let rx: Vector = -rz.cross(n).unit();
                     let ry: Vector = -rx.cross(rz).unit();
@@ -184,12 +184,12 @@ impl Scene {
                             
                             let traced_color: Vector = self.trace_ray(&scr, trace_limit - 1);
                             
-                            reflected_contribution += traced_color * scr.d * n;//* traced_color.magnitude();
+                            reflected_contribution += traced_color * f64::abs(scr.d * n) * coef;//* traced_color.magnitude();
                             coef_sum += coef;
                             count += 1;
                         }
                     }
-                    // reflected_contribution *= 1.0 / coef_sum;
+                    reflected_contribution *= 1.0 / coef_sum;
                     // let dray: Ray = Ray::new(p, ray.reflected_direction(n), Color::default(), ray.i);
                     // reflected_contribution *= -ray.d * n;
                 }
