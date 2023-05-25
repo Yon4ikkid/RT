@@ -36,6 +36,14 @@ impl Vector {
             z: self.x * other.y - self.y * other.x
         }
     }
+
+    pub fn ewm(self, other: Vector) -> Vector {
+        return Vector {
+            x: self.x * other.x,
+            y: self.y * other.y,
+            z: self.z * other.z,
+        }
+    }
 }
 
 impl ops::Add for Vector {

@@ -85,19 +85,19 @@ impl Camera {
     }
 
     pub fn get_ray(&self, row: f64, col: f64) -> Ray {
-        return Ray::new(self.origin, (self.pivot + self.right * (col + 0.5) + self.down * (row + 0.5)).unit(), Color { r: 1.0, g: 1.0, b: 1.0 }, 1.0);
+        return Ray::new(self.origin, (self.pivot + self.right * (col + 0.5) + self.down * (row + 0.5)).unit(), Color { x: 1.0, y: 1.0, z: 1.0 }, 1.0);
     }
 }
 
 impl Scene { 
-    fn trace_ray(&self, ray: &Ray, trace_limit: u64) -> Color {
+    fn trace_ray(&self, ray: &Ray, trace_limit: u64) -> Vector {
         let (mut p, mut n): (Vector, Vector);// = (false, Vector::default(), Vector::default());
         let mut min_distance: f64;
         let mut cur_distance: f64;
         let mut ray_segment: Vector;
         let mut incid: std::option::Option<&Object>;
         let obj: &Object;
-        let mut out_color: Color = Color::zero();
+        let mut out_color: Vector = Vector::default();
 
         p = ray.o;
         n = ray.d;
@@ -136,30 +136,36 @@ impl Scene {
 
                 let reflected: f64 = obj.m.opacity;
                 let transmitted: f64 = 1.0 - reflected;
-                let mut reflected_contribution: Color = Color::zero();
-                let mut transmitted_contribution: Color = Color::zero();
+                let mut reflected_contribution: Vector = Vector::default();
+                let mut transmitted_contribution: Vector = Vector::default();
 
                 if transmitted != 0.0 {
-                    let refracted_ray: Ray = Ray::new(p, ray.refracted_direction(n, source_index, target_index), Color { r: 1.0, g: 1.0, b: 1.0 }, target_index);
+                    let refracted_ray: Ray = Ray::new(p, ray.refracted_direction(n, source_index, target_index), Color { x: 1.0, y: 1.0, z: 1.0 }, target_index);
                     transmitted_contribution = self.trace_ray(&refracted_ray, trace_limit - 1);
                 }
 
                 if reflected != 0.0 {
-                    const DIFF_DIV: i64 = 4;
-                    const DIFF_DENSITY: f64 = 3.0;
+                    const DIFF_DENSITY: f64 = 4.0;
                     let rz: Vector = ray.reflected_direction(n);
                     let rx: Vector = -rz.cross(n).unit();
                     let ry: Vector = -rx.cross(rz).unit();
                     let in_angle: f64 = (-ray.d * n).acos();
                     let deviation: f64 = obj.m.roughness;
-                    let deviation_step: f64 = 1.0 / (DIFF_DIV as f64);
+                    
 
                     let f = |x: f64| -> f64 {
-                        f64::exp(- (1.0 / (deviation * in_angle.cos() + 0.01)) * (10.0 * x).powf(2.0))
+                        f64::exp(- (1.0 / (deviation + 0.01)) * (x).powf(2.0)) * (in_angle - PI / 2.0 * deviation).cos()
                         // 1.0
                     };
 
+                    let deviation_step: f64;
                     let diff_div: i64 = (DIFF_DENSITY * deviation) as i64; 
+                    if diff_div == 0 {
+                        deviation_step = 0.0;
+                    } else {
+                        deviation_step = 1.0 / (diff_div as f64);
+                    }
+                    
                     let mut coef_sum: f64 = 0.0;
                     let mut count = 0;
                     let mut scr: Ray = Ray::new(p, Vector::default(), Color::default(), ray.i);
@@ -176,19 +182,19 @@ impl Scene {
 
                             scr.d = (c1 * rx + c2 * ry + c3 * rz).unit();
                             
-                            let traced_color: Color = self.trace_ray(&scr, trace_limit - 1);
+                            let traced_color: Vector = self.trace_ray(&scr, trace_limit - 1);
                             
-                            reflected_contribution += traced_color * coef * traced_color.magnitude();
+                            reflected_contribution += traced_color * scr.d * n;//* traced_color.magnitude();
                             coef_sum += coef;
                             count += 1;
                         }
                     }
-                    reflected_contribution *= 1.0 / coef_sum;
+                    // reflected_contribution *= 1.0 / coef_sum;
                     // let dray: Ray = Ray::new(p, ray.reflected_direction(n), Color::default(), ray.i);
                     // reflected_contribution *= -ray.d * n;
                 }
 
-                out_color =  obj.m.base_color * (reflected * reflected_contribution + transmitted * transmitted_contribution);
+                out_color =  reflected * reflected_contribution.ewm(obj.m.reflected_color) + transmitted * transmitted_contribution.ewm(obj.m.transmitted_color) + obj.m.emitted_color;
             } else {
                 out_color *= 0.0;
             }
@@ -198,7 +204,7 @@ impl Scene {
             if (light_dir * ray.d).is_sign_negative() {
                 out_color = light_color * f64::max(-light_dir * ray.d, 0.0) * light_intensity;
             } else {
-                out_color = Color::zero();
+                out_color = Color::default();
             }
             out_color += self.ambient_light_color;
         }
@@ -209,7 +215,7 @@ impl Scene {
     pub fn render(&self, trace_limit: u64) {
         let mut image: RgbImage = RgbImage::new(self.camera.width as u32, self.camera.height as u32);
         let (mut r, mut g, mut b): (u8, u8, u8);
-        let mut out_color: Color;
+        let mut out_color: Vector;
         let mut ray: Ray;
 
         for row in 0..self.camera.height {
@@ -217,9 +223,9 @@ impl Scene {
                 ray = self.camera.get_ray(row as f64, col as f64);
                 out_color = self.trace_ray(&ray, trace_limit);
 
-                r = u8::min((out_color.r * 255.0) as u8, 255);
-                g = u8::min((out_color.g * 255.0) as u8, 255);
-                b = u8::min((out_color.b * 255.0) as u8, 255);
+                r = u8::min((out_color.x * 255.0) as u8, 255);
+                g = u8::min((out_color.y * 255.0) as u8, 255);
+                b = u8::min((out_color.z * 255.0) as u8, 255);
                 image.put_pixel(col as u32, row as u32, Rgb([r, g, b]));
             } 
         }
