@@ -2,7 +2,7 @@ use math::Vector;
 use rendering::{Object, Material, Color, PointLight, DirectionalLight};
 use tde::Sphere;
 
-use crate::tde::Plane;
+use crate::tde::{Plane, BiconvexLens, Paraboloid};
 
 pub mod math;
 pub mod tde;
@@ -11,7 +11,7 @@ pub mod scene;
 
 fn main() {
     // std::env::set_var("RUST_BACKTRACE", "1");
-    const AMB: f64 = 0.001;
+    const AMB: f64 = 0.05;
     let c: scene::Camera = scene::Camera::new(600, 600, 2000.0, math::Vector {x: 0.0, y: -2000.0, z: 0.0}, 0.0, 0.0, 0.0);
     let mut s: scene::Scene = scene::Scene { ambient_light_color: rendering::Color { x: AMB, y:AMB, z: AMB }, camera: c, objects: std::vec::Vec::new(),
                                             //  lightsource: Box::new(PointLight {c: Color { x: 1.0, y: 1.0, z: 1.0 } , o: Vector { x: 400.0, y: 75.0, z: 70.0 }, d: 800.0 }) };

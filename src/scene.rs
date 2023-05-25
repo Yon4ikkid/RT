@@ -167,7 +167,6 @@ impl Scene {
                     }
                     
                     let mut coef_sum: f64 = 0.0;
-                    let mut count = 0;
                     let mut scr: Ray = Ray::new(p, Vector::default(), Color::default(), ray.i);
                     for h in -diff_div..(diff_div + 1) {
                         let u: f64 = h as f64 * deviation_step;
@@ -186,12 +185,9 @@ impl Scene {
                             
                             reflected_contribution += traced_color * f64::abs(scr.d * n) * coef;//* traced_color.magnitude();
                             coef_sum += coef;
-                            count += 1;
                         }
                     }
                     reflected_contribution *= 1.0 / coef_sum;
-                    // let dray: Ray = Ray::new(p, ray.reflected_direction(n), Color::default(), ray.i);
-                    // reflected_contribution *= -ray.d * n;
                 }
 
                 out_color =  reflected * reflected_contribution.ewm(obj.m.reflected_color) + transmitted * transmitted_contribution.ewm(obj.m.transmitted_color) + obj.m.emitted_color;
