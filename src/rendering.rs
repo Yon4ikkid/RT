@@ -164,7 +164,7 @@ fn trace_ray(sc: &Scene, ray: &Ray, depth: u64) -> Color {
     }
 
     if reflected != 0.0 {
-        const DIFF_DENSITY: f64 = 4.0;
+        const DIFF_DENSITY: f64 = 5.0;
 
         let rz: Vector = ray.reflected_direction(n);
         let rx: Vector = -rz.cross(n).unit();
@@ -173,11 +173,12 @@ fn trace_ray(sc: &Scene, ray: &Ray, depth: u64) -> Color {
         let deviation: f64 = obj.m.roughness;
         let diff_div: i64 = (DIFF_DENSITY * deviation) as i64; 
 
-        let amplitude_modifier: f64 = (in_angle - PI * 0.5 * deviation).cos();
-        let frequency_modifier: f64 = -(1.0 / (deviation + 0.01));
+        // let amplitude_modifier: f64 = (in_angle - PI * 0.5 * deviation).cos();
+        // let frequency_modifier: f64 = -(1.0 / (deviation + 0.01));
 
         let f = |x: f64| -> f64 {
-            f64::exp( frequency_modifier * x * x) * amplitude_modifier
+            // f64::exp( frequency_modifier * x * x) * amplitude_modifier
+            1.0
         };
 
         let deviation_step: f64;
@@ -190,26 +191,24 @@ fn trace_ray(sc: &Scene, ray: &Ray, depth: u64) -> Color {
         let mut coef_sum: f64 = 0.0;
         let mut scr: Ray = Ray::new(p, Vector::default(), ray.i);
 
-        let mut u: f64 = -1.0;
-        for _ in -diff_div..(diff_div + 1) {
+        for h in -diff_div..(diff_div + 1) {
+            let u: f64 = h as f64 * deviation_step;
             let l1: f64 = f(u);
-            let mut s: f64 = -1.0;
-            for _ in -diff_div..(diff_div + 1) {
-                let coef: f64 =  l1 * f(s);
+            for v in -diff_div..(diff_div + 1) {
+                let s: f64 = v as f64 * deviation_step;
+                
 
                 let c1: f64 = (-0.5 * PI * s * deviation).sin();
                 let c2: f64 = (in_angle - 0.25 * PI * u * deviation).sin();
                 let c3: f64 = (in_angle - 0.25 * PI * u * deviation).cos();
 
                 scr.d = (c1 * rx + c2 * ry + c3 * rz).unit();
-                
+                let coef: f64 =  scr.d * n;//l1 * f(s);
                 let traced_color: Vector = trace_ray(sc, &scr, depth - 1);
                 
                 reflected_contribution += traced_color * coef;
                 coef_sum += coef;
-                s += deviation_step;
             }
-            u += deviation_step;
         }
         reflected_contribution /= coef_sum;
     }
