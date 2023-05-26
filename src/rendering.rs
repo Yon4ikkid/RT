@@ -1,6 +1,6 @@
 use crate::tde::Ray;
 use crate::math::Vector;
-use std::{boxed::Box, f64::consts::PI, thread::{JoinHandle, self}, sync::{Arc, Mutex}};
+use std::{f64::consts::PI, sync::{Arc, Mutex}, time::Instant, thread};
 use crate::scene::Scene;
 use std::vec::Vec;
 use image::{RgbImage, Rgb};
@@ -16,9 +16,9 @@ pub struct Material {
     pub roughness: f64,
 }
 
-pub struct Object {
+pub struct Object<'a> {
     pub m: Material,
-    pub s: Box<dyn Intersectable + Sync>,
+    pub s: &'a (dyn Intersectable + Sync) //Box<dyn Intersectable + Sync>,
 }
 
 pub trait Intersectable {
@@ -63,11 +63,13 @@ fn workplace(sc: &Scene, trace_limit: u64, image_arc: Arc<Mutex<RgbImage>>, s: u
     let mut ray: Ray;
     let mut out_color: Vector;
 
-    
+    let mut total_duration: u128 = 0;
     for row in s..e {
         for col in 0..sc.camera.width {
             ray = sc.camera.get_ray(row as f64, col as f64);
+            // let start = Instant::now();
             out_color = trace_ray(sc, &ray, trace_limit);
+            // total_duration += start.elapsed().as_nanos();
 
             r = u8::min((out_color.x * 255.0) as u8, 255);
             g = u8::min((out_color.y * 255.0) as u8, 255);
@@ -77,6 +79,7 @@ fn workplace(sc: &Scene, trace_limit: u64, image_arc: Arc<Mutex<RgbImage>>, s: u
             image.put_pixel(col, row, Rgb([r, g, b]));
         } 
     }
+    // println!("Worker average time per ray: {} nanoseconds", total_duration as f64 / (e - s) as f64 / sc.camera.width as f64);
 }
 
 /// Finds the closest intersection (object, point and normal) of the ray with an object cluster
@@ -85,7 +88,7 @@ fn workplace(sc: &Scene, trace_limit: u64, image_arc: Arc<Mutex<RgbImage>>, s: u
 /// 
 /// * `objects` - Vector containing the cluster objects
 /// * `ray` - The target ray
-fn find_closest_intersection<'a>(objects: &'a Vec<Object>, ray: &Ray) -> Option<(&'a Object, Vector, Vector)> {
+fn find_closest_intersection<'a>(objects: &'a Vec<Object>, ray: &Ray) -> Option<(&'a Object<'a>, Vector, Vector)> {
     let mut current_t: f64;
     let mut smallest_t: f64 = f64::MAX;
     let mut obj_ref_op: Option<&Object> = None;
@@ -119,28 +122,25 @@ fn find_closest_intersection<'a>(objects: &'a Vec<Object>, ray: &Ray) -> Option<
 /// * `ray` - Ray to trace
 /// * `depth` - Maximal tracing depth (i.e. incidence scattering)
 fn trace_ray(sc: &Scene, ray: &Ray, depth: u64) -> Color {
-    let mut out_color: Vector = Vector::default();
-    
     let int_op = find_closest_intersection(&sc.objects, ray);
 
     if int_op.is_none() {
         let (light_dir, light_intensity, light_color) = sc.lightsource.get_light(ray.o);
+        return f64::max(-light_dir * ray.d, 0.0) * light_intensity * light_color + sc.ambient_light_color;
         
-        if (light_dir * ray.d).is_sign_negative() {
-            out_color = light_color * f64::max(-light_dir * ray.d, 0.0) * light_intensity;
-        }
-
-        return out_color + sc.ambient_light_color;
     }
 
     let (obj, p, mut n): (&Object, Vector, Vector) = int_op.unwrap();
+    let mut d_dot_n = ray.d * n;
 
-    if (ray.d * n).is_sign_positive() {
+    if d_dot_n.is_sign_positive() {
         n = -n;
+    } else {
+        d_dot_n = -d_dot_n;
     }
 
     if depth == 1 {
-        return obj.m.emitted_color * (-ray.d * n);
+        return obj.m.emitted_color * d_dot_n;
     }
 
     let (source_index, mut target_index): (f64, f64) = (ray.i, obj.m.refractive_index);
@@ -164,17 +164,20 @@ fn trace_ray(sc: &Scene, ray: &Ray, depth: u64) -> Color {
     }
 
     if reflected != 0.0 {
-        const DIFF_DENSITY: f64 = 2.0;
+        const DIFF_DENSITY: f64 = 4.0;
 
         let rz: Vector = ray.reflected_direction(n);
         let rx: Vector = -rz.cross(n).unit();
         let ry: Vector = -rx.cross(rz).unit();
-        let in_angle: f64 = (-ray.d * n).acos();
+        let in_angle: f64 = d_dot_n.acos();
         let deviation: f64 = obj.m.roughness;
         let diff_div: i64 = (DIFF_DENSITY * deviation) as i64; 
 
+        let amplitude_modifier: f64 = (in_angle - PI * 0.5 * deviation).cos();
+        let frequency_modifier: f64 = -(1.0 / (deviation + 0.01));
+
         let f = |x: f64| -> f64 {
-            f64::exp(- (1.0 / (deviation + 0.01)) * (x).powf(2.0)) * (in_angle - PI / 2.0 * deviation).cos()
+            f64::exp( frequency_modifier * x * x) * amplitude_modifier
         };
 
         let deviation_step: f64;
@@ -186,11 +189,12 @@ fn trace_ray(sc: &Scene, ray: &Ray, depth: u64) -> Color {
         
         let mut coef_sum: f64 = 0.0;
         let mut scr: Ray = Ray::new(p, Vector::default(), ray.i);
-        for h in -diff_div..(diff_div + 1) {
-            let u: f64 = h as f64 * deviation_step;
+
+        let mut u: f64 = -1.0;
+        for _ in -diff_div..(diff_div + 1) {
             let l1: f64 = f(u);
-            for v in -diff_div..(diff_div + 1) {
-                let s: f64 = v as f64 * deviation_step;
+            let mut s: f64 = -1.0;
+            for _ in -diff_div..(diff_div + 1) {
                 let coef: f64 =  l1 * f(s);
 
                 let c1: f64 = (-0.5 * PI * s * deviation).sin();
@@ -201,12 +205,14 @@ fn trace_ray(sc: &Scene, ray: &Ray, depth: u64) -> Color {
                 
                 let traced_color: Vector = trace_ray(sc, &scr, depth - 1);
                 
-                reflected_contribution += traced_color * coef;//* traced_color.magnitude();
+                reflected_contribution += traced_color * coef;
                 coef_sum += coef;
+                s += deviation_step;
             }
+            u += deviation_step;
         }
-        reflected_contribution *= 1.0 / coef_sum;
+        reflected_contribution /= coef_sum;
     }
 
-    return reflected * reflected_contribution.ewm(obj.m.reflected_color) + transmitted * transmitted_contribution.ewm(obj.m.transmitted_color) + (-ray.d * n) * obj.m.emitted_color;
+    return reflected * reflected_contribution.ewm(obj.m.reflected_color) + transmitted * transmitted_contribution.ewm(obj.m.transmitted_color) + d_dot_n * obj.m.emitted_color;
 }

@@ -25,7 +25,7 @@ impl Ray {
     }
 
     pub fn reflected_direction(&self, n: Vector) -> Vector {
-        return (((-self.d) * n) * n + self.d) * 2.0 - self.d;
+        return self.d - (self.d * n) * n * 2.0;
     }
 }
 
@@ -48,7 +48,7 @@ impl Intersectable for Sphere {
         }
 
         let t: f64 = (-b - det.sqrt()) / (2.0 * a);
-        if t <= 0.0 {
+        if t < 0.01 {
             return None;
         }
 
@@ -128,6 +128,7 @@ impl Intersectable for BiconvexLens {
         let check = |p: Vector| {
             (p - self.c).norm() <= (self.r * self.r - self.r * (1.0 - self.a)).sqrt()
         };
+        
         let t1 = op_t1.unwrap();
         let t2 = op_t2.unwrap();
 
@@ -189,7 +190,7 @@ impl Intersectable for Paraboloid {
         }
 
         let t1: f64 = (-beta - det.sqrt()) / (2.0 * alpha);
-        if t1 <= 0.0 {
+        if t1 < 0.01 {
             return None;
         }
         let p1: Vector = r.get_point(t1);

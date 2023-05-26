@@ -5,10 +5,10 @@ use crate::rendering::Object;
 use crate::tde::Ray;
 use std::vec::Vec;
 
-pub struct Scene {
+pub struct Scene<'a> {
     pub ambient_light_color: Color,
     pub camera: Camera,
-    pub objects: Vec<Object>,
+    pub objects: Vec<Object<'a>>,
     pub lightsource: Box<dyn Lightsource + Sync>,
 }
 

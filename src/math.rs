@@ -98,18 +98,14 @@ impl ops::Div<f64> for Vector {
     type Output = Vector;
 
     fn div(self, rhs: f64) -> Self::Output {
-        if rhs == 0.0 {
-            panic!("Vector division by zero!");
-        }
+        assert_ne!(rhs, 0.0);
         return Vector { x: self.x / rhs, y: self.y / rhs, z: self.z / rhs };
     }
 }
 
 impl ops::DivAssign<f64> for Vector {
     fn div_assign(&mut self, rhs: f64) {
-        if rhs == 0.0 {
-            panic!("Vector division by zero!");
-        }
+        assert_ne!(rhs, 0.0);
         self.x /= rhs;
         self.y /= rhs;
         self.z /= rhs;
@@ -161,9 +157,7 @@ impl Matrix {
     }
 
     pub fn inverse(self) -> Result<Matrix, i32> {
-        if self.width != 2 || self.height != 2 {
-            panic!("Trying to inverse a non 2x2 matrix!");
-        }
+        assert!(self.width == 2 && self.height == 2);
 
         let mut m: Matrix = Matrix::new(2,2);
 
