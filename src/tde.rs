@@ -36,7 +36,7 @@ pub struct Sphere {
 }
 
 impl Intersectable for Sphere {
-    fn intersect(&self, r: &Ray) -> (bool, Vector, Vector) {
+    fn intersect(&self, r: &Ray) -> Option<f64> {
         let  (a, b, c, det): (f64,f64,f64,f64);
         let l: Vector = r.o - self.c;
         a = r.d * r.d;
@@ -45,16 +45,19 @@ impl Intersectable for Sphere {
         det = b * b - 4.0 * a * c;
 
         if det < 0.0 {
-            return (false, Vector::default(), Vector::default());
+            return None;
         }
 
         let t: f64 = (-b - det.sqrt()) / (2.0 * a);
-        if t < 0.01 {
-            return (false, Vector::default(), Vector::default());
+        if t <= 0.0 {
+            return None;
         }
 
-        let p: Vector = r.get_point(t);
-        return (true, p, (p - self.c).unit());
+        return Some(t);
+    }
+
+    fn get_normal(&self, p: Vector) -> Vector {
+        return (p - self.c).unit();
     }
 }
 
@@ -64,18 +67,22 @@ pub struct Plane {
 }
 
 impl Intersectable for Plane {
-    fn intersect(&self, r: &Ray) -> (bool, Vector, Vector) {
+    fn intersect(&self, r: &Ray) -> Option<f64> {
         let div: f64 = self.n * r.d;
         if div == 0.0 {
-            return (false, Vector::default(), Vector::default());
+            return None;
         }
 
         let t: f64 = (self.n * (self.a - r.o)) / div;
         if t < 0.01 {
-            return (false, Vector::default(), Vector::default());
+            return None;
         }
 
-        return (true, r.get_point(t), self.n);
+        return Some(t);
+    }
+
+    fn get_normal(&self, _p: Vector) -> Vector {
+        return self.n;
     }
 }
 
@@ -111,26 +118,36 @@ impl BiconvexLens {
 }
 
 impl Intersectable for BiconvexLens {
-    fn intersect(&self, r: &Ray) -> (bool, Vector, Vector) {
-        let (b1, p1, n1): (bool, Vector, Vector) = self.sp1.intersect(r);
-        let (b2, p2, n2) = self.sp2.intersect(r);
+    fn intersect(&self, r: &Ray) -> Option<f64> {
+        let op_t1 = self.sp1.intersect(r);
+        let op_t2 = self.sp2.intersect(r);
 
-        if !(b1 && b2) {
-            return (false, Vector::default(), Vector::default());
+        if op_t1.is_none() && op_t2.is_none() {
+            return None;
         }
 
         let check = |p: Vector| {
             (p - self.c).norm() <= (self.r * self.r - self.r * (1.0 - self.a)).sqrt()
         };
+        let t1 = op_t1.unwrap();
+        let t2 = op_t2.unwrap();
 
-        if check(p1) {
-            return (true, p1, n1);
+        if check(r.get_point(t1)) {
+            return Some(t1);
         }
-        if check(p2) {
-            return (true, p2, n2);
+        if check(r.get_point(t2)) {
+            return Some(t2);
         }
 
-        return (false, Vector::default(), Vector::default());
+        return None;
+    }
+
+    fn get_normal(&self, p: Vector) -> Vector {
+        if p * self.sp1.c == self.r * self.r {
+            return (p - self.sp1.c).unit();
+        } else {
+            return (p - self.sp2.c).unit();
+        }
     }
 }
 
@@ -144,7 +161,6 @@ pub struct BiconcaveLens {
 
 pub struct Paraboloid {
     f: Vector,
-    p: Vector,
     n: Vector,
     hfl: f64,
     l: f64,
@@ -154,7 +170,6 @@ impl Paraboloid {
     pub fn new(apex: Vector, axis: Vector, fcl: f64, length: f64) -> Paraboloid {
         return Paraboloid {
             f: apex + fcl * axis,
-            p: apex - fcl * axis,
             n: axis,
             hfl: fcl,
             l: length,
@@ -163,7 +178,7 @@ impl Paraboloid {
 }
 
 impl Intersectable for Paraboloid {
-    fn intersect(&self, r: &Ray) -> (bool, Vector, Vector) {
+    fn intersect(&self, r: &Ray) -> Option<f64> {
         let k: Vector = r.o - self.f;
         let alpha: f64 = (r.d * self.n).powf(2.0) - r.d * r.d;
         let beta: f64 = 4.0 * self.hfl * (r.d * self.n) - 2.0 * (r.d * self.n) * (k * self.n) - 2.0 * (r.d * k);
@@ -171,18 +186,22 @@ impl Intersectable for Paraboloid {
         let det: f64 = beta * beta - 4.0 * alpha * gamma;
 
         if det < 0.0 {
-            return (false, Vector::default(), Vector::default());
+            return None;
         }
 
         let t1: f64 = (-beta - det.sqrt()) / (2.0 * alpha);
-        if t1 < 0.01 {
-            return (false, Vector::default(), Vector::default());
+        if t1 <= 0.0 {
+            return None;
         }
         let p1: Vector = r.get_point(t1);
         if (p1 - self.f).norm() - self.hfl > self.l {
-            return (false, Vector::default(), Vector::default());            
+            return None;            
         }
-        return (true, p1, (self.n + (p1 - self.f).unit()).unit());
+        return Some(t1);
         
+    }
+
+    fn get_normal(&self, p: Vector) -> Vector {
+        return (self.n + (p - self.f).unit()).unit();
     }
 }

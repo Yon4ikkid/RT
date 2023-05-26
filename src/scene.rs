@@ -2,12 +2,9 @@
 use crate::math::Vector;
 use crate::math::Matrix;
 use crate::rendering::Color;
-use crate::rendering::Lightsource;
 use crate::rendering::Object;
 use crate::tde::Ray;
-use std::f64::consts::PI;
 use std::vec::Vec;
-use image::{RgbImage, Rgb};
 
 pub struct Scene {
     pub ambient_light_color: Color,
@@ -17,11 +14,11 @@ pub struct Scene {
 }
 
 pub struct Camera {
-    origin: Vector,
+    pub origin: Vector,
     pivot: Vector,
     right: Vector,
     down: Vector,
-    focal_distance: f64,
+    pub focal_distance: f64,
     pub width: usize,
     pub height: usize,
 }
@@ -89,142 +86,30 @@ impl Camera {
     }
 }
 
-impl Scene { 
-    fn trace_ray(&self, ray: &Ray, trace_limit: u64) -> Vector {
-        let (mut p, mut n): (Vector, Vector);// = (false, Vector::default(), Vector::default());
-        let mut min_distance: f64;
-        let mut cur_distance: f64;
-        let mut ray_segment: Vector;
-        let mut incid: std::option::Option<&Object>;
-        let obj: &Object;
-        let mut out_color: Vector = Vector::default();
+pub trait Lightsource {
+    fn get_light(&self, p: Vector) -> (Vector, f64, Color);
+}
 
-        p = ray.o;
-        n = ray.d;
-        min_distance = 0.0;
-        incid = None;
-        for object in &self.objects {
-            let (d, pp, nn) = object.s.intersect(&ray);
-            if d == true {
-                ray_segment = pp - self.camera.origin;
-                cur_distance = ray_segment * ray_segment;
-                if min_distance == 0.0 || cur_distance < min_distance {
-                    min_distance = cur_distance;
-                    incid = Some(object);
-                    p = pp;
-                    n = nn;
-                }
-            }
-        }
+pub struct DirectionalLight {
+    pub c: Color,
+    pub d: Vector
+}
 
-        if (ray.d * n).is_sign_positive() {
-            n = -n;
-        }
+pub struct PointLight {
+    pub c: Color,
+    pub o: Vector,
+    pub d: f64,
+}
 
-        if incid.is_some() {
-            obj = incid.unwrap();
-            if trace_limit > 1 {
-                let (source_index, mut target_index): (f64, f64) = (ray.i, obj.m.refractive_index);
-                if source_index == target_index {
-                    target_index = 1.0;
-                }
-                
-                // Schlick's Approximation
-                // let r0: f64 = ((source_index - target_index) / (source_index + target_index)).powf(2.0);
-                // let reflected: f64 = r0 + (1.0 - r0) * (1.0 - (-ray.d) * n).powf(5.0);
-                // let transmitted: f64 = 1.0 - reflected;
-
-                let reflected: f64 = obj.m.opacity;
-                let transmitted: f64 = 1.0 - reflected;
-                let mut reflected_contribution: Vector = Vector::default();
-                let mut transmitted_contribution: Vector = Vector::default();
-
-                if transmitted != 0.0 {
-                    let refracted_ray: Ray = Ray::new(p, ray.refracted_direction(n, source_index, target_index), Color { x: 1.0, y: 1.0, z: 1.0 }, target_index);
-                    transmitted_contribution = self.trace_ray(&refracted_ray, trace_limit - 1);
-                }
-
-                if reflected != 0.0 {
-                    const DIFF_DENSITY: f64 = 10.0;
-                    let rz: Vector = ray.reflected_direction(n);
-                    let rx: Vector = -rz.cross(n).unit();
-                    let ry: Vector = -rx.cross(rz).unit();
-                    let in_angle: f64 = (-ray.d * n).acos();
-                    let deviation: f64 = obj.m.roughness;
-                    
-
-                    let f = |x: f64| -> f64 {
-                        f64::exp(- (1.0 / (deviation + 0.01)) * (x).powf(2.0)) * (in_angle - PI / 2.0 * deviation).cos()
-                        // 1.0
-                    };
-
-                    let deviation_step: f64;
-                    let diff_div: i64 = (DIFF_DENSITY * deviation) as i64; 
-                    if diff_div == 0 {
-                        deviation_step = 0.0;
-                    } else {
-                        deviation_step = 1.0 / (diff_div as f64);
-                    }
-                    
-                    let mut coef_sum: f64 = 0.0;
-                    let mut scr: Ray = Ray::new(p, Vector::default(), Color::default(), ray.i);
-                    for h in -diff_div..(diff_div + 1) {
-                        let u: f64 = h as f64 * deviation_step;
-                        let l1: f64 = f(u);
-                        for v in -diff_div..(diff_div + 1) {
-                            let s: f64 = v as f64 * deviation_step;
-                            let coef: f64 =  l1 * f(s);
-
-                            let c1: f64 = (-0.5 * PI * s * deviation).sin();
-                            let c2: f64 = (in_angle - 0.25 * PI * u * deviation).sin();
-                            let c3: f64 = (in_angle - 0.25 * PI * u * deviation).cos();
-
-                            scr.d = (c1 * rx + c2 * ry + c3 * rz).unit();
-                            
-                            let traced_color: Vector = self.trace_ray(&scr, trace_limit - 1);
-                            
-                            reflected_contribution += traced_color * f64::abs(scr.d * n) * coef;//* traced_color.magnitude();
-                            coef_sum += coef;
-                        }
-                    }
-                    reflected_contribution *= 1.0 / coef_sum;
-                }
-
-                out_color =  reflected * reflected_contribution.ewm(obj.m.reflected_color) + transmitted * transmitted_contribution.ewm(obj.m.transmitted_color) + obj.m.emitted_color;
-            } else {
-                out_color *= 0.0;
-            }
-        } else {
-            let (light_dir, light_intensity, light_color) = self.lightsource.get_light(p);
-            
-            if (light_dir * ray.d).is_sign_negative() {
-                out_color = light_color * f64::max(-light_dir * ray.d, 0.0) * light_intensity;
-            } else {
-                out_color = Color::default();
-            }
-            out_color += self.ambient_light_color;
-        }
-
-        return out_color;
+impl Lightsource for DirectionalLight {
+    fn get_light(&self, _p: Vector) -> (Vector, f64, Color) {
+        return (self.d, 1.0, self.c);
     }
+}
 
-    pub fn render(&self, trace_limit: u64) {
-        let mut image: RgbImage = RgbImage::new(self.camera.width as u32, self.camera.height as u32);
-        let (mut r, mut g, mut b): (u8, u8, u8);
-        let mut out_color: Vector;
-        let mut ray: Ray;
-
-        for row in 0..self.camera.height {
-            for col in 0..self.camera.width {
-                ray = self.camera.get_ray(row as f64, col as f64);
-                out_color = self.trace_ray(&ray, trace_limit);
-
-                r = u8::min((out_color.x * 255.0) as u8, 255);
-                g = u8::min((out_color.y * 255.0) as u8, 255);
-                b = u8::min((out_color.z * 255.0) as u8, 255);
-                image.put_pixel(col as u32, row as u32, Rgb([r, g, b]));
-            } 
-        }
-        image.save("output.png").unwrap();
+impl Lightsource for PointLight {
+    fn get_light(&self, p: Vector) -> (Vector, f64, Color) {
+        let v = p - self.o;
+        return (v.unit(), f64::clamp(1.0 - v.norm() / self.d, 0.0, 1.0), self.c);
     }
 }
