@@ -1,16 +1,15 @@
 use crate::math::Vector;
-use crate::rendering::{Intersectable, Color};
+use crate::rendering::Intersectable;
 
 pub struct Ray {
     pub o: Vector,  // Origin
     pub d: Vector,  // Direction
-    pub c: Color,   // Color intensities
     pub i: f64,     // Medium infraction index
 }
 
 impl Ray {
-    pub fn new(o: Vector, d: Vector, c: Color, i: f64) -> Ray {
-        return Ray { o, d, c, i };
+    pub fn new(o: Vector, d: Vector, i: f64) -> Ray {
+        return Ray { o, d, i };
     }
 
     pub fn get_point(&self, t: f64) -> Vector {

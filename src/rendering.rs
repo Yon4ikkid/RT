@@ -1,9 +1,8 @@
 use crate::tde::Ray;
 use crate::math::Vector;
-#[doc(hidden)]
-use std::{boxed::Box, f64::consts::PI};
+use std::{boxed::Box, f64::consts::PI, thread::{JoinHandle, self}, sync::{Arc, Mutex}};
 use crate::scene::Scene;
-#[doc(hidden)]
+use std::vec::Vec;
 use image::{RgbImage, Rgb};
 
 pub type Color = Vector;
@@ -19,7 +18,7 @@ pub struct Material {
 
 pub struct Object {
     pub m: Material,
-    pub s: Box<dyn Intersectable>,
+    pub s: Box<dyn Intersectable + Sync>,
 }
 
 pub trait Intersectable {
@@ -33,13 +32,39 @@ pub trait Intersectable {
 /// 
 /// * `sc` - Target scene
 /// * `trace_limit` - The depth limit of the rendering process
-pub fn render(sc: &Scene, trace_limit: u64) {
-    let mut image: RgbImage = RgbImage::new(sc.camera.width as u32, sc.camera.height as u32);
-    let (mut r, mut g, mut b): (u8, u8, u8);
-    let mut out_color: Vector;
-    let mut ray: Ray;
+pub fn render(sc: &Scene, trace_limit: u64, n_workers: u32) {
+    let image: RgbImage = RgbImage::new(sc.camera.width, sc.camera.height);
+    let height: u32 = sc.camera.height;
 
-    for row in 0..sc.camera.height {
+    let async_ref = Arc::new(Mutex::new(image));
+
+    if n_workers > sc.camera.height {
+        panic!("Worker number exceeds camera height!");
+    }
+
+    let lines_per_worker: u32 = height / n_workers;
+    let mut lines_issued: u32 = 0;
+
+    thread::scope(|s| {
+        for _ in 0..(n_workers - 1) {
+            let local_ref = async_ref.clone();
+            s.spawn(move || { workplace(sc, trace_limit, local_ref, lines_issued, lines_issued + lines_per_worker)} );
+            lines_issued += lines_per_worker;
+        }
+        let local_ref = async_ref.clone();
+        s.spawn(move || workplace(sc, trace_limit, local_ref, lines_issued, height));
+    });
+
+    async_ref.lock().unwrap().save("output.png").unwrap();
+}
+
+fn workplace(sc: &Scene, trace_limit: u64, image_arc: Arc<Mutex<RgbImage>>, s: u32, e: u32) {
+    let (mut r, mut g, mut b): (u8, u8, u8);
+    let mut ray: Ray;
+    let mut out_color: Vector;
+
+    
+    for row in s..e {
         for col in 0..sc.camera.width {
             ray = sc.camera.get_ray(row as f64, col as f64);
             out_color = trace_ray(sc, &ray, trace_limit);
@@ -47,13 +72,19 @@ pub fn render(sc: &Scene, trace_limit: u64) {
             r = u8::min((out_color.x * 255.0) as u8, 255);
             g = u8::min((out_color.y * 255.0) as u8, 255);
             b = u8::min((out_color.z * 255.0) as u8, 255);
-            image.put_pixel(col as u32, row as u32, Rgb([r, g, b]));
+
+            let mut image = image_arc.lock().unwrap();
+            image.put_pixel(col, row, Rgb([r, g, b]));
         } 
     }
-    image.save("output.png").unwrap();
 }
 
-
+/// Finds the closest intersection (object, point and normal) of the ray with an object cluster
+/// 
+/// # Arguments
+/// 
+/// * `objects` - Vector containing the cluster objects
+/// * `ray` - The target ray
 fn find_closest_intersection<'a>(objects: &'a Vec<Object>, ray: &Ray) -> Option<(&'a Object, Vector, Vector)> {
     let mut current_t: f64;
     let mut smallest_t: f64 = f64::MAX;
@@ -80,7 +111,13 @@ fn find_closest_intersection<'a>(objects: &'a Vec<Object>, ray: &Ray) -> Option<
     return Some((obj_ref, p, obj_ref.s.get_normal(p)));
 }
 
-
+/// Trace the path of a given ray in the scene
+/// 
+/// # Arguments
+/// 
+/// * `sc` - Target scene
+/// * `ray` - Ray to trace
+/// * `depth` - Maximal tracing depth (i.e. incidence scattering)
 fn trace_ray(sc: &Scene, ray: &Ray, depth: u64) -> Color {
     let mut out_color: Vector = Vector::default();
     
@@ -122,12 +159,12 @@ fn trace_ray(sc: &Scene, ray: &Ray, depth: u64) -> Color {
     let mut transmitted_contribution: Vector = Vector::default();
 
     if transmitted != 0.0 {
-        let refracted_ray: Ray = Ray::new(p, ray.refracted_direction(n, source_index, target_index), Color { x: 1.0, y: 1.0, z: 1.0 }, target_index);
+        let refracted_ray: Ray = Ray::new(p, ray.refracted_direction(n, source_index, target_index), target_index);
         transmitted_contribution = trace_ray(sc, &refracted_ray, depth - 1);
     }
 
     if reflected != 0.0 {
-        const DIFF_DENSITY: f64 = 3.0;
+        const DIFF_DENSITY: f64 = 2.0;
 
         let rz: Vector = ray.reflected_direction(n);
         let rx: Vector = -rz.cross(n).unit();
@@ -148,7 +185,7 @@ fn trace_ray(sc: &Scene, ray: &Ray, depth: u64) -> Color {
         }
         
         let mut coef_sum: f64 = 0.0;
-        let mut scr: Ray = Ray::new(p, Vector::default(), Color::default(), ray.i);
+        let mut scr: Ray = Ray::new(p, Vector::default(), ray.i);
         for h in -diff_div..(diff_div + 1) {
             let u: f64 = h as f64 * deviation_step;
             let l1: f64 = f(u);

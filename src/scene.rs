@@ -1,4 +1,3 @@
-
 use crate::math::Vector;
 use crate::math::Matrix;
 use crate::rendering::Color;
@@ -10,7 +9,7 @@ pub struct Scene {
     pub ambient_light_color: Color,
     pub camera: Camera,
     pub objects: Vec<Object>,
-    pub lightsource: Box<dyn Lightsource>,
+    pub lightsource: Box<dyn Lightsource + Sync>,
 }
 
 pub struct Camera {
@@ -19,8 +18,8 @@ pub struct Camera {
     right: Vector,
     down: Vector,
     pub focal_distance: f64,
-    pub width: usize,
-    pub height: usize,
+    pub width: u32,
+    pub height: u32,
 }
 
 impl Camera {
@@ -36,7 +35,7 @@ impl Camera {
         };
     }
 
-    pub fn new(height: usize, width: usize, fd: f64, origin: Vector, x_rot: f64, y_rot: f64, z_rot: f64) -> Camera {
+    pub fn new(height: u32, width: u32, fd: f64, origin: Vector, x_rot: f64, y_rot: f64, z_rot: f64) -> Camera {
         let mut cam: Camera = Camera::empty();
         cam.focal_distance = fd;
         cam.origin = origin;
@@ -82,7 +81,7 @@ impl Camera {
     }
 
     pub fn get_ray(&self, row: f64, col: f64) -> Ray {
-        return Ray::new(self.origin, (self.pivot + self.right * (col + 0.5) + self.down * (row + 0.5)).unit(), Color { x: 1.0, y: 1.0, z: 1.0 }, 1.0);
+        return Ray::new(self.origin, (self.pivot + self.right * (col + 0.5) + self.down * (row + 0.5)).unit(), 1.0);
     }
 }
 

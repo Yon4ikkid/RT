@@ -1,6 +1,4 @@
-#[doc(hidden)]
 use std::ops;
-#[doc(hidden)]
 use std::cmp::Eq;
 
 #[derive(Copy, Clone)]
