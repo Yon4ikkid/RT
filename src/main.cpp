@@ -25,7 +25,7 @@ int main()
     // Plane* p = new Plane(Vector(-420, 30, -200), Vector(-420, 530, -200), Vector(350, 280, -200), Material(140,200,140,0));
     // Plane* p = new Plane(Vector(-900, 0, -260), Vector(-900,1000,-160), Vector(800,50,-250), Material(140,200,140,0));
     // std::cout << p->get_normal(Vector()) << '\n';
-    scene.sceneObjects.push_back(p);
+    // scene.sceneObjects.push_back(p);
 
     // scene.lightSource = new DirectionalLight(Vector(2,2,-1));
     scene.lightSource = new SourceLight(Vector(0, 50, 200), 4000);

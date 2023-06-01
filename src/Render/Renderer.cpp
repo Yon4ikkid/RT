@@ -6,17 +6,54 @@
 #include "Ray.h"
 #include "../Lighting/LightRay.h"
 #include <iostream>
+#include <limits>
 
 using namespace Tracer;
 
-float calculate_shading(Ray r, Vector& n, Scene& scene, IRenderable* exception)
-{
-    float t;
-    for (int k = 0; k < (int)scene.sceneObjects.size(); k++)
-        if (scene.sceneObjects[k] != exception && scene.sceneObjects[k]->intersect(r, t))
-            return 0;
+struct Incidence {
+    Vector n;
+    Vector p;
+    Material m;
+};
 
+float calculate_shading(Ray r, Vector& n, Scene& scene)
+{
     return std::max<float>(0, n * r.d);
+}
+
+bool find_closest_intersection(std::vector<IRenderable*>& objects, const Ray& r, Incidence& out)
+{
+    Intersection intersection;
+    IRenderable* obj = NULL;
+
+    float closest = std::numeric_limits<float>::max();
+    for (int k = 0; k < (int)objects.size(); k++)
+        if (objects[k]->intersect(r, intersection))
+            if (closest > intersection.t)
+            {
+                closest = intersection.t;
+                obj = objects[k];
+            }
+
+    if (obj == NULL)
+        return false;
+
+    out.m = intersection.m;
+    out.p = r(intersection.t);
+    out.n = intersection.s->get_normal(out.p);
+
+    return true;
+}
+
+Pixel trace_ray(Scene& scene, const Ray& r) 
+{
+    Incidence incid;
+    if (!find_closest_intersection(scene.sceneObjects, r, incid))
+        return Pixel();
+    
+    LightRay lightRay = scene.lightSource->get_light_ray(incid.p);
+    float coef = calculate_shading(lightRay, incid.n, scene);
+    return (Pixel)incid.m.color * coef * lightRay.intensity;
 }
 
 void Tracer::render_scene(Scene& scene)
@@ -26,35 +63,11 @@ void Tracer::render_scene(Scene& scene)
     Image img(scene.camera.get_height(), scene.camera.get_width());
 
     Ray r;
-    LightRay lightRay;
-    IRenderable* obj;
-    Intersection intersection;
-    float closest = 0, t = 0, coef = 0;
     for (int i = 1; i <= h; i++)
         for (int j = 1; j <= w; j++)
         {
-            closest = 0;
             r = scene.camera.get_ray(i, j);
-
-            for (int k = 0; k < (int)scene.sceneObjects.size(); k++)
-                if (scene.sceneObjects[k]->intersect(r, t))
-                    if (closest == 0 || closest > t)
-                    {
-                        closest = t;
-                        obj = scene.sceneObjects[k];
-                    }
-
-            if (closest == 0) 
-                continue;
-            
-            obj->intersect
-            p = r(closest);
-            normal = surf->get_normal(p);
-            
-            lightRay = scene.lightSource->get_light_ray(p);
-            coef = calculate_shading(lightRay, normal, scene, obj);
-            img.SetPixel(i - 1, j - 1, (Pixel)surf->get_material().color * coef * lightRay.intensity);
+            img.SetPixel(i - 1, j - 1, trace_ray(scene, r));
         }
-
     img.Save();
 }

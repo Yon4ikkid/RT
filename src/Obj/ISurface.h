@@ -20,11 +20,9 @@ namespace Tracer
 	private:
 		Material surface_material;
 
-	protected:
-		virtual Vector get_normal(const Vector& p) const = 0;
-
 	public:
 		ISurface(const Material& material);
 		Material get_material() const;
+		virtual Vector get_normal(const Vector& p) const = 0;
 	};
 }

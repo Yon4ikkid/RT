@@ -118,6 +118,15 @@ float Vector::norm() const
 	return sqrtf((*this) * (*this));
 }
 
+Vector Vector::cross(const Vector& other) const
+{
+	return Vector(
+		this->y * other.z - this->z * other.y,
+		this->z * other.x - this->x * other.z,
+		this->x * other.y - this->y * other.x
+	);
+}
+
 /**
  * @brief Copy assignment operator overload
  * 

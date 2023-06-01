@@ -35,6 +35,7 @@ namespace Tracer
 		Vector operator-() const;
 		Vector unit() const;
 		float norm() const;
+		Vector cross(const Vector& other) const;
 
 		Vector& operator=(const Vector& other);
 		Vector& operator+=(const Vector& other);

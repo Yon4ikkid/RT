@@ -1,38 +1,43 @@
 #include "Triangle.h"
-
+#include "Plane.h"
+#include "../Math/Matrix.h"
 using namespace Tracer;
 
-Triangle::Triangle(Vector a, Vector b, Vector c, const Material& material) : ISurface(material), ab(b - a), ac(c - a)
+Triangle::Triangle(Vector a, Vector b, Vector c, const Material& material)
 {
-    Matrix A(2,2);
-    A.v[0][0] = ab.x;
-    A.v[0][1] = ab.y;
-    A.v[1][0] = ac.x;
-    A.v[1][1] = ac.y;
+    // Matrix solution
+    // Matrix A(2,2);
+    // A.v[0][0] = this->u.x;
+    // A.v[0][1] = this->u.y;
+    // A.v[1][0] = this->v.x;
+    // A.v[1][1] = this->v.y;
 
-    Matrix X(2,1);
-    X.v[0][0] = -ab.z;
-    X.v[1][0] = -ac.z;
+    // Matrix X(2,1);
+    // X.v[0][0] = -this->u.z;
+    // X.v[1][0] = -this->v.z;
 
-    Matrix N = A.inverse() * X;
+    // Matrix N = A.inverse() * X;
 
-    this->normal = ;
-    this->p = a;
-    this->plane = Plane(a, Vector(N.v[0][0], N.v[1][0], 1).unit(), material)
+    // Cross
+    this->u = b - a;
+    this->v = c - a;
+    Vector n = this->u.cross(this->v);
+
+    this->p = Plane(a, n.unit(), material);
 }
 
-bool Triangle::intersect(const Ray& r, Intersection& out) override
+bool Triangle::intersect(const Ray& r, Intersection& out)
 {
-    if (!this->plane.intersect(r, out))
+    if (!this->p.intersect(r, out))
         return false;
 
-    Vector p = out.p - a;
+    Vector p = r(out.t) - this->p.get_pivot();
 
     Matrix A(2,2);
-    A.v[0][0] = ab.x;
-    A.v[0][1] = ac.x;
-    A.v[1][0] = ab.y;
-    A.v[1][1] = ac.y;
+    A.v[0][0] = this->u.x;
+    A.v[0][1] = this->v.x;
+    A.v[1][0] = this->u.y;
+    A.v[1][1] = this->v.y;
 
     Matrix X(2,1);
     X.v[0][0] = p.x;
