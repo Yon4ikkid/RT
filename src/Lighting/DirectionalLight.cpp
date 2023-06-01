@@ -4,7 +4,7 @@
 
 using namespace Tracer;
 
-DirectionalLight::DirectionalLight(Vector d) : direction(d.unit()) { }
+DirectionalLight::DirectionalLight(Vector d, int color[3]) : ILight(color), direction(d.unit()) { }
 
 LightRay DirectionalLight::get_light_ray(Vector& hitpoint)
 {

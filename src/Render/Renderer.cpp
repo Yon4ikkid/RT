@@ -49,11 +49,13 @@ Pixel trace_ray(Scene& scene, const Ray& r)
 {
     Incidence incid;
     if (!find_closest_intersection(scene.sceneObjects, r, incid))
-        return Pixel();
+    { // Light
+        LightRay lr = scene.lightSource->get_light_ray(incid.p);
+        float coef =  std::max<float>(0, incid.n * r.d);
+        return (Pixel)scene.lightSource->get_color() * coef * lr.intensity;
+    }
     
-    LightRay lightRay = scene.lightSource->get_light_ray(incid.p);
-    float coef = calculate_shading(lightRay, incid.n, scene);
-    return (Pixel)incid.m.color * coef * lightRay.intensity;
+    return (Pixel)incid.m.color;
 }
 
 void Tracer::render_scene(Scene& scene)

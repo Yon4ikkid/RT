@@ -4,7 +4,7 @@
 
 using namespace Tracer;
 
-Plane::Plane(Vector p, Vector n, const Material& material) : ISurface(material),  normal(n), p(p) { }
+Plane::Plane(Vector p, Vector n, const Material& material) : ISurface(material) , p(p), normal(n) { }
 
 Plane::Plane() : ISurface(Material()) {}
 

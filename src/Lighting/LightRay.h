@@ -7,6 +7,7 @@ namespace Tracer
     {
     public:
         float intensity;
+        int color[3];
         
         LightRay();
         LightRay(Vector o, Vector d, float i);

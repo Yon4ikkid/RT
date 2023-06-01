@@ -10,7 +10,7 @@ namespace Tracer
         float maxDistance;
 
     public:
-        SourceLight(Vector s, float md);
+        SourceLight(Vector s, float md, int color[3]);
         virtual LightRay get_light_ray(Vector& hitpoint) override;
     };
 }

@@ -2,7 +2,7 @@
 
 using namespace Tracer;
 
-SourceLight::SourceLight(Vector s, float md) : source(s), maxDistance(md) { }
+SourceLight::SourceLight(Vector s, float md, int color[3]) :  ILight(color), source(s), maxDistance(md) { }
 
 LightRay SourceLight::get_light_ray(Vector& hitpoint)
 {
