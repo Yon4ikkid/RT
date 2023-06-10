@@ -9,7 +9,8 @@ namespace Tracer
         Vector direction;
 
     public:
-        DirectionalLight(Vector direction, int color[3]); 
-        virtual LightRay get_light_ray(Vector& hitpoint) override;
+        DirectionalLight(Vector direction, const float r, const float g, const float b, float ii); 
+        const Vector get_direction(const Vector p) override;
+        const float get_intensity(const Vector p) override;
     };
 }

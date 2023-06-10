@@ -29,9 +29,9 @@ Pixel::Pixel(const unsigned int r, const unsigned int g, const unsigned int b)
 
 Pixel::Pixel(const Vector v) 
 {
-	this->value[0] = v.x * 255.0;
-	this->value[1] = v.y * 255.0;
-	this->value[2] = v.z * 255.0;
+	this->value[0] = v.x * 255.0f;
+	this->value[1] = v.y * 255.0f;
+	this->value[2] = v.z * 255.0f;
 }
 
 Pixel::Pixel(const Pixel& other) 

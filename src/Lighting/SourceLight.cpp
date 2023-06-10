@@ -2,12 +2,14 @@
 
 using namespace Tracer;
 
-SourceLight::SourceLight(Vector s, float md, int color[3]) :  ILight(color), source(s), maxDistance(md) { }
+SourceLight::SourceLight(Vector s, float md, const float r, const float g, const float b, const float ii) :  ILight(r,g,b,ii), source(s), max_distance(md) { }
 
-LightRay SourceLight::get_light_ray(Vector& hitpoint)
+const Vector SourceLight::get_direction(const Vector p)
 {
-    Vector direction = source - hitpoint;
-    float distance = direction.norm();
-    float intensity = std::max<float>(0, (maxDistance - distance) / maxDistance);
-    return LightRay(hitpoint, direction * (1.0f / distance), intensity);
+    return (p - this->source).unit();
+}
+
+const float SourceLight::get_intensity(const Vector p)
+{
+    return std::max<float>(1.0 - (p - this->source).norm() / this->max_distance, 0.0);
 }

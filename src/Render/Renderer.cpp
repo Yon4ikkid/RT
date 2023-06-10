@@ -4,7 +4,6 @@
 #include "../Obj/ISurface.h"
 #include "Intersection.h"
 #include "Ray.h"
-#include "../Lighting/LightRay.h"
 #include <iostream>
 #include <limits>
 
@@ -16,7 +15,7 @@ struct Incidence {
     Material m;
 };
 
-float calculate_shading(Ray r, Vector& n, Scene& scene)
+float calculate_shading(Ray r, Vector n, Scene& scene)
 {
     return std::max<float>(0, n * r.d);
 }
@@ -58,11 +57,7 @@ Vector trace_ray(Scene& scene, const Ray& r)
 {
     Incidence incid;
     if (!find_closest_intersection(scene.sceneObjects, r, incid))
-    { // Light
-        LightRay lr = scene.lightSource->get_light_ray(incid.p);
-        float coef =  std::max<float>(0, incid.n * r.d);
-        return scene.lightSource->get_color() * coef * lr.intensity;
-    }
+        return scene.lightSource->get_color() * calculate_shading(r, incid.n, scene);
     
     return incid.m.color;
 }

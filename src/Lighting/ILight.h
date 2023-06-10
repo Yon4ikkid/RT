@@ -1,5 +1,5 @@
 #pragma once
-#include "LightRay.h"
+#include "../Math/Vector.h"
 
 namespace Tracer
 {
@@ -7,13 +7,16 @@ namespace Tracer
     {
     private: 
         Vector color;
+    
+    protected:
+        float initial_intensity;
 
     public:
         ILight();
-        ILight(const int r, const int g, const int b);
-        ILight(const int values[3]);
+        ILight(const float r, const float g, const float b, float ii);
         const Vector get_color() const;
-        virtual LightRay get_light_ray(Vector& hitpoint) = 0;
+        virtual const Vector get_direction(const Vector p) = 0;
+        virtual const float get_intensity(const Vector p) = 0;
         virtual ~ILight();
     };
 }
