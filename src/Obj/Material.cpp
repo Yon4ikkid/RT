@@ -17,7 +17,7 @@ using namespace Tracer;
  * @brief Construct a new Material:: Material object - default
  * 
  */
-Material::Material() : roughness(0), transmission(0), color{ 255, 0, 0 } { }
+Material::Material() : roughness(0), transmission(0), color({ 1.0, 0, 0 }) { }
 
 /**
  * @brief Construct a new Tracer:: Material:: Material object
@@ -27,13 +27,7 @@ Material::Material() : roughness(0), transmission(0), color{ 255, 0, 0 } { }
  * @param b - blue
  * @param irdr - reflective direction randomization factor (diffusive reflection)
  */
-Tracer::Material::Material(const int r, const int g, const int b, const float irdr, const float trn) : roughness(irdr), transmission(trn), color{ r, g, b } { }
-
-/**
- * @brief Construct a new Material:: Material object
- * 
- * @param color - rgb color
- * @param rdr - reflective direction randomization factor (diffusive reflection)
- */
-Material::Material(const int color[3], const float rdr, const float tnr)
-	: Material(color[0], color[1], color[2], rdr, tnr) { }
+Tracer::Material::Material(const float r, const float g, const float b, const float irdr, const float trn) : roughness(irdr), transmission(trn), color{ r, g, b }
+{
+	this->color = Vector(r / 255.0, g / 255.0, b / 255.0);
+}

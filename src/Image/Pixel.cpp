@@ -27,9 +27,19 @@ Pixel::Pixel(const unsigned int r, const unsigned int g, const unsigned int b)
 	value[2] = b;
 }
 
-Pixel::Pixel(const int value[3]) : Pixel(value[0], value[1], value[2]) { }
+Pixel::Pixel(const Vector v) 
+{
+	this->value[0] = v.x * 255.0;
+	this->value[1] = v.y * 255.0;
+	this->value[2] = v.z * 255.0;
+}
 
-Pixel::Pixel(const Pixel& other) : Pixel(other.value) { }
+Pixel::Pixel(const Pixel& other) 
+{
+	this->value[0] = other.value[0];
+	this->value[1] = other.value[1];
+	this->value[2] = other.value[2];
+}
 
 Pixel& Pixel::operator=(const Pixel& other)
 {
@@ -38,18 +48,4 @@ Pixel& Pixel::operator=(const Pixel& other)
 	this->value[2] = other.value[2];
 
 	return *this;
-}
-
-Pixel& Pixel::operator=(const int value[3])
-{
-	this->value[0] = value[0];
-	this->value[1] = value[1];
-	this->value[2] = value[2];
-
-	return *this;
-}
-
-Pixel Pixel::operator*(const float q)
-{
-	return Pixel(this->value[0] * q, this->value[1] * q, this->value[2] * q);
 }

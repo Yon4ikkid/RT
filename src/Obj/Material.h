@@ -10,6 +10,7 @@
  */
 
 #pragma once
+#include "../Math/Vector.h"
 
 namespace Tracer
 {
@@ -23,10 +24,9 @@ namespace Tracer
 		//	of the reflection varies.
 		float roughness;
 		float transmission;
-		int color[3];
+		Vector color;
 
 		Material();
-		Material(const int r, const int g, const int b, const float irdr, float trn);
-		Material(const int icolor[3], const float irdr, float trn);
+		Material(const float r, const float g, const float b, const float irdr, float trn);
 	};
 }

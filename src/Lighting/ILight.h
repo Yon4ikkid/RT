@@ -6,13 +6,13 @@ namespace Tracer
     class ILight
     {
     private: 
-        int color[3];
+        Vector color;
 
     public:
         ILight();
         ILight(const int r, const int g, const int b);
         ILight(const int values[3]);
-        const int* get_color() const;
+        const Vector get_color() const;
         virtual LightRay get_light_ray(Vector& hitpoint) = 0;
         virtual ~ILight();
     };

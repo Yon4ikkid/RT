@@ -10,6 +10,7 @@
  */
 
 #pragma once
+#include "../Math/Vector.h"
 
 namespace Tracer
 {
@@ -19,11 +20,9 @@ namespace Tracer
 
 		Pixel();
 		Pixel(const unsigned int r, const unsigned int g, const unsigned int b);
-		Pixel(const int ivalue[3]);
+		Pixel(const Vector v);
 		Pixel(const Pixel& other);
 
 		Pixel& operator=(const Pixel& other);
-		Pixel& operator=(const int ivalue[3]);
-		Pixel operator*(const float q);
 	};
 }

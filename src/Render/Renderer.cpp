@@ -21,6 +21,15 @@ float calculate_shading(Ray r, Vector& n, Scene& scene)
     return std::max<float>(0, n * r.d);
 }
 
+/**
+ * @brief Finds the closest intersection of the ray with the given set of objects
+ * 
+ * @param objects - set of target objects
+ * @param r - the ray
+ * @param out - incidence information (if found)
+ * @return true - found intersection
+ * @return false - no intersection found
+ */
 bool find_closest_intersection(std::vector<IRenderable*>& objects, const Ray& r, Incidence& out)
 {
     Intersection intersection;
@@ -45,17 +54,17 @@ bool find_closest_intersection(std::vector<IRenderable*>& objects, const Ray& r,
     return true;
 }
 
-Pixel trace_ray(Scene& scene, const Ray& r) 
+Vector trace_ray(Scene& scene, const Ray& r) 
 {
     Incidence incid;
     if (!find_closest_intersection(scene.sceneObjects, r, incid))
     { // Light
         LightRay lr = scene.lightSource->get_light_ray(incid.p);
         float coef =  std::max<float>(0, incid.n * r.d);
-        return (Pixel)scene.lightSource->get_color() * coef * lr.intensity;
+        return scene.lightSource->get_color() * coef * lr.intensity;
     }
     
-    return (Pixel)incid.m.color;
+    return incid.m.color;
 }
 
 void Tracer::render_scene(Scene& scene)
@@ -69,7 +78,7 @@ void Tracer::render_scene(Scene& scene)
         for (int j = 1; j <= w; j++)
         {
             r = scene.camera.get_ray(i, j);
-            img.SetPixel(i - 1, j - 1, trace_ray(scene, r));
+            img.SetPixel(i - 1, j - 1, (Pixel)trace_ray(scene, r));
         }
     img.Save();
 }
