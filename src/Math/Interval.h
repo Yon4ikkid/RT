@@ -1,3 +1,13 @@
+/**
+ * @file Interval.h
+ * @author Yon Kidalov (yon4ikkid@gmail.com)
+ * @brief Definition of the Interval struct
+ * @version 0.1
+ * @date 2023-07-18
+ * 
+ * @copyright Copyright (c) 2023
+ * 
+ */
 #pragma once
 
 namespace Tracer
