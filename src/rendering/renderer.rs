@@ -66,9 +66,9 @@ fn workplace(sc: &Scene, trace_limit: u64, image_arc: Arc<Mutex<RgbImage>>, s: u
     for row in s..e {
         for col in 0..sc.camera.width {
             ray = sc.camera.get_ray(row as f64, col as f64);
-            // let start = Instant::now();
+            let start = Instant::now();
             out_color = trace_ray(sc, &ray, trace_limit);
-            // total_duration += start.elapsed().as_nanos();
+            total_duration += start.elapsed().as_nanos();
 
             r = u8::min((out_color.x * 255.0) as u8, 255);
             g = u8::min((out_color.y * 255.0) as u8, 255);
@@ -78,7 +78,7 @@ fn workplace(sc: &Scene, trace_limit: u64, image_arc: Arc<Mutex<RgbImage>>, s: u
             image.put_pixel(col, row, Rgb([r, g, b]));
         } 
     }
-    // println!("Worker average time per ray: {} nanoseconds", total_duration as f64 / (e - s) as f64 / sc.camera.width as f64);
+    println!("Worker average time per ray: {} nanoseconds", total_duration as f64 / (e - s) as f64 / sc.camera.width as f64);
 }
 
 /// Finds the closest intersection (object, point and normal) of the ray with an object cluster
@@ -172,12 +172,12 @@ fn trace_ray(sc: &Scene, ray: &Ray, depth: u64) -> Color {
         let deviation: f64 = obj.m.roughness;
         let diff_div: i64 = (DIFF_DENSITY * deviation) as i64; 
 
-        // let amplitude_modifier: f64 = (in_angle - PI * 0.5 * deviation).cos();
-        // let frequency_modifier: f64 = -(1.0 / (deviation + 0.01));
+        let amplitude_modifier: f64 = (in_angle - PI * 0.5 * deviation).cos();
+        let frequency_modifier: f64 = -(1.0 / (deviation + 0.01));
 
         let f = |x: f64| -> f64 {
-            // f64::exp( frequency_modifier * x * x) * amplitude_modifier
-            1.0
+            f64::exp( frequency_modifier * x * x) * amplitude_modifier
+            //1.0
         };
 
         let deviation_step: f64;
@@ -202,7 +202,7 @@ fn trace_ray(sc: &Scene, ray: &Ray, depth: u64) -> Color {
                 let c3: f64 = (in_angle - 0.25 * PI * u * deviation).cos();
 
                 scr.d = (c1 * rx + c2 * ry + c3 * rz).unit();
-                let coef: f64 =  scr.d * n;//l1 * f(s);
+                let coef: f64 =  scr.d * n * l1 * f(s);
                 let traced_color: Vector = trace_ray(sc, &scr, depth - 1);
                 
                 reflected_contribution += traced_color * coef;

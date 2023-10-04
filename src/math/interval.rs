@@ -1,5 +1,4 @@
 use std::result::Result;
-use std::cmp::{min, max};
 
 pub struct Interval {
     a: f64,
@@ -8,7 +7,7 @@ pub struct Interval {
 
 impl Interval {
     pub fn new(a: f64, b: f64) -> Result<Interval, i32> {
-        if (a >= b) {
+        if a >= b {
             return Err(23);
         } else {
             return Ok(Interval{a, b});
