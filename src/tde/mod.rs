@@ -8,7 +8,6 @@ pub mod triangle;
 pub mod paraboloid;
 pub mod open_cylinder;
 
-use crate::rendering::Intersectable;
 pub use self::sphere::Sphere;
 pub use self::plane::Plane;
 pub use self::circle::Circle;
