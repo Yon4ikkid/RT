@@ -1,9 +1,8 @@
+use image::{RgbImage, Rgb};
 use crate::tde::Ray;
 use crate::math::Vector;
+use super::Scene;
 use std::{f64::consts::PI, sync::{Arc, Mutex}, time::Instant, thread};
-use crate::scene::Scene;
-use std::vec::Vec;
-use image::{RgbImage, Rgb};
 
 pub type Color = Vector;
 

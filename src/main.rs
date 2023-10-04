@@ -1,22 +1,22 @@
 use std::time::Instant;
 
 use math::Vector;
-use rendering::{Object, Material, Color};
-use scene::{DirectionalLight};
+use rendering::renderer::{Object, Material, Color};
+use rendering::scene::DirectionalLight;
+use rendering::{Camera, Scene};
 use tde::Sphere;
 
-use crate::{tde::{Plane}, rendering::render};
+use crate::{tde::Plane, rendering::renderer::render};
 
 pub mod math;
 pub mod tde;
 pub mod rendering;
-pub mod scene;
 
 fn main() {
     // std::env::set_var("RUST_BACKTRACE", "1");
     const AMB: f64 = 0.005;
-    let c: scene::Camera = scene::Camera::new(600, 600, 2000.0, math::Vector {x: 0.0, y: -2000.0, z: 0.0}, 0.0, 0.0, 0.0);
-    let mut s: scene::Scene = scene::Scene { ambient_light_color: rendering::Color { x: AMB, y:AMB, z: AMB }, camera: c, objects: std::vec::Vec::new(),
+    let c: Camera = Camera::new(600, 600, 2000.0, math::Vector {x: 0.0, y: -2000.0, z: 0.0}, 0.0, 0.0, 0.0);
+    let mut s: Scene = Scene { ambient_light_color: rendering::Color { x: AMB, y:AMB, z: AMB }, camera: c, objects: std::vec::Vec::new(),
                                             //  lightsource: Box::new(PointLight {c: Color { x: 1.0, y: 1.0, z: 1.0 } , o: Vector { x: 0.0, y: 80.0, z: 120.0 }, d: 1200.0 }) };
                                             lightsource: Box::new(DirectionalLight {c: Color { x: 1.0, y: 1.0, z: 1.0 } , d: Vector { x: -1.0, y: 1.0, z: -0.5 }.unit()}) };
                                             

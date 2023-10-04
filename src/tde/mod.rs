@@ -1,0 +1,20 @@
+pub mod sphere;
+pub mod plane;
+pub mod circle;
+pub mod byconcave_lens;
+pub mod byconvex_lens;
+pub mod ray;
+pub mod triangle;
+pub mod paraboloid;
+pub mod open_cylinder;
+
+use crate::rendering::Intersectable;
+pub use self::sphere::Sphere;
+pub use self::plane::Plane;
+pub use self::circle::Circle;
+pub use self::ray::Ray;
+pub use self::triangle::Triangle;
+pub use self::paraboloid::Paraboloid;
+pub use self::open_cylinder::OpenCylinder;
+pub use self::byconcave_lens::BiconcaveLens;
+pub use self::byconvex_lens::BiconvexLens;
