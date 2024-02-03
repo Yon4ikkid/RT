@@ -3,14 +3,14 @@
 
 namespace Tracer 
 {
-    class Triangle : public IRenderable
+    class Triangle : public ISurface
     {
     private:
         Plane p;
         Vector u, v;
 
     public:
-        Triangle(const Vector a, const Vector b, const Vector c, const Material& material);
-        bool intersect(const Ray& r, Intersection& out) override;
+        Triangle(const Vector a, const Vector b, const Vector c);
+        std::optional<float> intersect(const Ray& r) override;
     };
 }

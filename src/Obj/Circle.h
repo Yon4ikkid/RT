@@ -3,14 +3,14 @@
 
 namespace Tracer
 {
-    class Circle : public IRenderable
+    class Circle : public ISurface
     {
     private:
         Plane plane;
         float radius;
 
     public:
-        Circle(const Vector a, const Vector n, const float r, const Material& material);
-        bool intersect(const Ray& r, Intersection& out) override;
+        Circle(const Vector a, const Vector n, const float r);
+        std::optional<float> intersect(const Ray& r) override;
     };
 }

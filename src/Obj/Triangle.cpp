@@ -1,9 +1,10 @@
 #include "Triangle.h"
 #include "Plane.h"
 #include "../Math/Matrix.h"
+
 using namespace Tracer;
 
-Triangle::Triangle(Vector a, Vector b, Vector c, const Material& material)
+Triangle::Triangle(Vector a, Vector b, Vector c)
 {
     // Matrix solution
     // Matrix A(2,2);
@@ -23,15 +24,18 @@ Triangle::Triangle(Vector a, Vector b, Vector c, const Material& material)
     this->v = c - a;
     Vector n = this->u.cross(this->v);
 
-    this->p = Plane(a, n.unit(), material);
+    this->p = Plane(a, n.unit());
 }
 
-bool Triangle::intersect(const Ray& r, Intersection& out)
+std::optional<float> Triangle::intersect(const Ray& r)
 {
-    if (!this->p.intersect(r, out))
-        return false;
+    auto t_opt = this->p.intersect(r);
+    
+    if (!t_opt.has_value())
+        return t_opt;
 
-    Vector p = r(out.t) - this->p.get_pivot();
+    float t = t_opt.value();
+    Vector p = r(t) - this->p.get_pivot();
 
     Matrix A(2,2);
     A.v[0][0] = this->u.x;
@@ -48,7 +52,7 @@ bool Triangle::intersect(const Ray& r, Intersection& out)
     float s = alpha + beta;
 
     if (std::abs(s) <= 1 && alpha >= 0 && beta >= 0)
-        return true;
+        return t;
     
-    return false;
+    return std::nullopt;
 }

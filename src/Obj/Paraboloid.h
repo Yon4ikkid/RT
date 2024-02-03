@@ -3,17 +3,18 @@
 
 namespace Tracer
 {
-    class Plane : public ISurface
+    class Paraboloid : public ISurface
     {
     private:
-        Vector p, normal;
+        Vector focus, axis;
+        float focal_length, axis,length;
         
     protected:
         Vector get_normal(const Vector& p) const override;
 
     public:
-        Plane();
-        Plane(Vector p, Vector n);
+        Paraboloid();
+        Paraboloid(Vector apex, Vector n);
         Vector get_pivot() const;
         std::optional<float> intersect(const Ray& r) override;
     };

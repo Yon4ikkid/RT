@@ -12,17 +12,14 @@
 #pragma once
 #include "../Render/IRenderable.h"
 #include "Material.h"
+#include <optional>
 
 namespace Tracer
 {
-	class ISurface : public IRenderable
+	class ISurface
 	{
-	private:
-		Material surface_material;
-
 	public:
-		ISurface(const Material& material);
-		Material get_material() const;
+		virtual std::optional<float> intersect(const Ray& r) = 0;
 		virtual Vector get_normal(const Vector& p) const = 0;
 	};
 }
