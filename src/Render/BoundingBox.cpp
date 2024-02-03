@@ -50,8 +50,8 @@ Interval BoundingBox::construct_interval(const float ac, const float bc, const f
  */
 bool BoundingBox::is_ray_in(const Ray& r) const
 {
-    Interval i1 = this->construct_interval(this->a.x, this->b.x, r.d.x, r.o.x);
-    Interval i2 = this->construct_interval(this->a.y, this->b.y, r.d.y, r.o.y);
-    Interval i3 = this->construct_interval(this->a.z, this->b.z, r.d.z, r.o.z);
+    Interval i1 = this->construct_interval(this->a.x, this->b.x, r.o.x, r.d.x);
+    Interval i2 = this->construct_interval(this->a.y, this->b.y, r.o.y, r.d.y);
+    Interval i3 = this->construct_interval(this->a.z, this->b.z, r.o.z, r.d.z);
     return (i1 & i2) && i3;
 }

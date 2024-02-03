@@ -7,15 +7,14 @@ namespace Tracer
     {
     private:
         Vector focus, axis;
-        float focal_length, axis,length;
+        float focal_length, length;
         
     protected:
         Vector get_normal(const Vector& p) const override;
 
     public:
         Paraboloid();
-        Paraboloid(Vector apex, Vector n);
-        Vector get_pivot() const;
+        Paraboloid(Vector apex, Vector n, float focal_length, float length);
         std::optional<float> intersect(const Ray& r) override;
     };
 }

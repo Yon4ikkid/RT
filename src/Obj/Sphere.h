@@ -26,7 +26,9 @@ namespace Tracer
 		Vector get_normal(const Vector& p) const override;
 
 	public:
+		Sphere();
 		Sphere(const Vector& center, const float radius);
+		Vector get_centre() const;
 		std::optional<float> intersect(const Ray& r) override;
 	};
 }

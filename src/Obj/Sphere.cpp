@@ -15,6 +15,8 @@
 
 using namespace Tracer;
 
+Sphere::Sphere() { }
+
 Sphere::Sphere(const Vector& center, const float radius) 
 	: centre(center), radius(radius) { }
 
@@ -27,6 +29,12 @@ Sphere::Sphere(const Vector& center, const float radius)
 Vector Sphere::get_normal(const Vector& p) const
 {
 	return (p - centre).unit();
+}
+
+
+Vector Sphere::get_centre() const
+{
+	return this->centre;
 }
 
 
