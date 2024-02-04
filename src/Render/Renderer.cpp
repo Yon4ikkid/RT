@@ -77,11 +77,6 @@ void render_fragment(Scene& scene, Image& img, int start_row, int end_row, int s
         }
 }
 
-void ATT(int z)
-{
-    std::cout << "A";
-}
-
 
 void Tracer::render_scene(Scene &scene, const int job_count)
 {
@@ -91,16 +86,14 @@ void Tracer::render_scene(Scene &scene, const int job_count)
     std::vector<std::thread> workers;
 
     int start_row = 1, delta = h / job_count, end_row = delta;
-    //std::thread t(ATT, 0);
     for (int current_job = 1; current_job < job_count; current_job++)
     {
-
-        //workers.push_back(std::move(std::thread(render_fragment, std::ref(scene), std::ref(img), start_row, end_row, 1, w)));
+        workers.push_back(std::move(std::thread(render_fragment, std::ref(scene), std::ref(img), start_row, end_row, 1, w)));
         start_row += delta;
         end_row += delta;
     }
     end_row = h;
-    //workers.push_back(std::move(std::thread(render_fragment, std::ref(scene), std::ref(img), start_row, end_row, 1, w)));
+    workers.push_back(std::move(std::thread(render_fragment, std::ref(scene), std::ref(img), start_row, end_row, 1, w)));
 
     for (std::thread& t: workers)
         t.join();
