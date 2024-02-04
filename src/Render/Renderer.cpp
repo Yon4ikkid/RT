@@ -5,15 +5,17 @@
 #include "Intersection.h"
 #include "Ray.h"
 #include <iostream>
-#include <limits>
+#include <thread>
 
 using namespace Tracer;
 
-struct Incidence {
+struct Incidence
+{
     Vector n;
     Vector p;
     Material m;
 };
+
 
 float calculate_shading(Ray r, Vector n, Scene& scene)
 {
@@ -45,13 +47,14 @@ bool find_closest_intersection(std::vector<IRenderable*>& objects, const Ray& r,
 
     if (obj == NULL)
         return false;
-
+    
     out.m = intersection.m;
     out.p = r(intersection.t);
     out.n = intersection.s->get_normal(out.p);
 
     return true;
 }
+
 
 Vector trace_ray(Scene& scene, const Ray& r) 
 {
@@ -62,18 +65,45 @@ Vector trace_ray(Scene& scene, const Ray& r)
     return incid.m.color;
 }
 
-void Tracer::render_scene(Scene& scene)
+
+void render_fragment(Scene& scene, Image& img, int start_row, int end_row, int start_col, int end_col)
+{
+    Ray r;
+    for (int row = start_row; row <= end_row; row++)
+        for (int col = start_col; col <= end_col; col++)
+        {
+            r = scene.camera.get_ray(row, col);
+            img.SetPixel(row - 1, col - 1, (Pixel)trace_ray(scene, r));
+        }
+}
+
+void ATT(int z)
+{
+    std::cout << "A";
+}
+
+
+void Tracer::render_scene(Scene &scene, const int job_count)
 {
     int w = scene.camera.get_width();
     int h = scene.camera.get_height();
     Image img(scene.camera.get_height(), scene.camera.get_width());
+    std::vector<std::thread> workers;
 
-    Ray r;
-    for (int i = 1; i <= h; i++)
-        for (int j = 1; j <= w; j++)
-        {
-            r = scene.camera.get_ray(i, j);
-            img.SetPixel(i - 1, j - 1, (Pixel)trace_ray(scene, r));
-        }
+    int start_row = 1, delta = h / job_count, end_row = delta;
+    //std::thread t(ATT, 0);
+    for (int current_job = 1; current_job < job_count; current_job++)
+    {
+
+        //workers.push_back(std::move(std::thread(render_fragment, std::ref(scene), std::ref(img), start_row, end_row, 1, w)));
+        start_row += delta;
+        end_row += delta;
+    }
+    end_row = h;
+    //workers.push_back(std::move(std::thread(render_fragment, std::ref(scene), std::ref(img), start_row, end_row, 1, w)));
+
+    for (std::thread& t: workers)
+        t.join();
+
     img.Save();
 }

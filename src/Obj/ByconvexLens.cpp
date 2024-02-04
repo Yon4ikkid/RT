@@ -1,4 +1,5 @@
 #include "ByconvexLens.h"
+#include <cmath>
 
 using namespace Tracer;
 

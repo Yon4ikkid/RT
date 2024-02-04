@@ -4,5 +4,5 @@
 
 namespace Tracer
 {
-    void render_scene(Scene& scene);
+    void render_scene(Scene& scene, const int job_count);
 }

@@ -46,7 +46,7 @@ int main()
     // scene.lightSource = new DirectionalLight(Vector(2,2,-1));
     scene.lightSource = new SourceLight(Vector(0, 50, 200), 4000, 255,255,255,1.0);
 
-    render_scene(scene);
+    render_scene(scene, 8);
 
     return 0;
 }
